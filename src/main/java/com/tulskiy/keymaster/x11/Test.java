@@ -1,4 +1,4 @@
-package com.tulskiy.keymaster;
+package com.tulskiy.keymaster.x11;
 
 
 import com.sun.org.apache.xerces.internal.impl.dv.xs.AnyURIDV;
