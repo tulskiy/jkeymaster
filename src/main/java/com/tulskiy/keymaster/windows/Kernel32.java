@@ -13,5 +13,5 @@ public class Kernel32 {
         BridJ.register();
     }
     public static native int GetLastError();
-
+    public static native long GetCurrentThreadId();
 }
