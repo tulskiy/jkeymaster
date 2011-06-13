@@ -2,19 +2,22 @@ package com.tulskiy.keymaster.common;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
+import java.util.logging.Logger;
 
 /**
  * Author: Denis Tulskiy
  * Date: 6/12/11
  */
 public interface Provider {
+    public static final Logger logger = Logger.getLogger(Provider.class.getName());
+
     public void init();
 
-    public boolean stop();
+    public void stop();
 
     public void registerMediaKeyListener(ActionListener listener);
 
-    public boolean register(String keyCode, ActionListener listener);
+    public void register(KeyStroke keyCode, ActionListener listener);
 
-    public boolean unregisterAll();
+    public void reset();
 }

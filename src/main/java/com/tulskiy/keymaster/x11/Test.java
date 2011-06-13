@@ -19,23 +19,36 @@ public class Test {
         Pointer<LibX11.XDisplay> display = XOpenDisplay(null);
         long window = XDefaultRootWindow(display);
 
-        Pointer<Byte> pString = Pointer.pointerToCString("XF86AudioPlay");
+        Pointer<Byte> pString = Pointer.pointerToCString("b");
         byte keyCode = XKeysymToKeycode(display, XStringToKeysym(pString));
 
-        int modifiers = 0;
-        XGrabKey(display, 176, modifiers, window, true, GrabModeAsync, GrabModeAsync);
+        int modifiers = ControlMask | Mod1Mask;
+        int ret = XGrabKey(display, keyCode, modifiers, window, true, GrabModeAsync, GrabModeAsync);
+        if (ret == 0)
+            System.out.println("aargh");
 
         Pointer<XEvent> ptr = Pointer.allocate(XEvent.class);
-        while (true) {
-            XNextEvent(display, ptr);
 
-            XEvent event = ptr.get();
-            if (event.type() == KeyPress
-                    && event.xkey().keycode() == keyCode
-                    && event.xkey().state() == modifiers) {
-                System.out.println("Fuck yeah");
-                XUngrabKey(display, keyCode, modifiers, window);
-                break;
+        boolean listening = true;
+
+        while (listening) {
+            while (XPending(display) > 0) {
+                XNextEvent(display, ptr);
+
+                XEvent event = ptr.get();
+                if (event.type() == KeyPress
+                        && event.xkey().keycode() == keyCode
+                        && event.xkey().state() == modifiers) {
+                    System.out.println("Fuck yeah");
+                    XUngrabKey(display, keyCode, modifiers, window);
+                    listening = false;
+                }
+            }
+
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }

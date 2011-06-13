@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.EnumMap;
 
-import static com.tulskiy.keymaster.windows.Kernel32.GetCurrentThreadId;
 import static com.tulskiy.keymaster.windows.User32.*;
 
 /**
@@ -79,16 +78,12 @@ public class WindowsProvider implements Provider {
         }
     }
 
-    public boolean register(String keyCode, ActionListener listener) {
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(keyCode);
-        return false;
+    public void register(KeyStroke keyCode, ActionListener listener) {
     }
 
-    public boolean unregisterAll() {
-        return false;
+    public void reset() {
     }
 
-    public boolean stop() {
-        return false;
+    public void stop() {
     }
 }
