@@ -6,9 +6,9 @@ import org.bridj.Pointer;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipError;
 
 import static com.tulskiy.keymaster.x11.LibX11.*;
 
@@ -17,7 +17,7 @@ import static com.tulskiy.keymaster.x11.LibX11.*;
  * Date: 6/13/11
  */
 public class X11Provider implements Provider {
-    private HashMap<KeyStroke, ActionListener> listeners = new HashMap<KeyStroke, ActionListener>();
+    private Map<KeyStroke, ActionListener> listeners = Collections.synchronizedMap(new HashMap<KeyStroke, ActionListener>());
     private Pointer<LibX11.XDisplay> display;
     private long window;
     private boolean initialized = false;
