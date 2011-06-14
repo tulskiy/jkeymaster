@@ -67,6 +67,9 @@ public class Converter {
         put(VK_DIVIDE, XK_KP_Divide);
         put(VK_MULTIPLY, XK_KP_Multiply);
         put(VK_INSERT, XK_Insert);
+        put(VK_ADD, XK_KP_Add);
+        put(VK_SUBTRACT, XK_KP_Subtract);
+        put(VK_BEGIN, XK_KP_Begin);
     }};
 
     public static byte getCode(KeyStroke keyStroke, Pointer<XDisplay> display) {
