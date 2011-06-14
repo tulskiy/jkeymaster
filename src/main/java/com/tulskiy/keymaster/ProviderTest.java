@@ -64,6 +64,12 @@ public class ProviderTest {
         provider.register(KeyStroke.getKeyStroke("control shift BACK_QUOTE"), listener);
         provider.register(KeyStroke.getKeyStroke("control shift UP"), listener);
         provider.register(KeyStroke.getKeyStroke("control shift INSERT"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift DELETE"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift ADD"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift SUBTRACT"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift COMMA"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift PERIOD"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift SEMICOLON"), listener);
 
         provider.register(KeyStroke.getKeyStroke("control alt HOME"), new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -77,10 +83,10 @@ public class ProviderTest {
             }
         });
 
-//        provider.register(KeyStroke.getKeyStroke("control alt NUMPAD0"), new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.out.println(e.getSource());
-//            }
-//        });
+        provider.register(KeyStroke.getKeyStroke("control alt NUMPAD0"), new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                System.out.println(e.getSource());
+            }
+        });
     }
 }

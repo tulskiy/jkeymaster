@@ -19,10 +19,10 @@ public class Test {
         Pointer<LibX11.XDisplay> display = XOpenDisplay(null);
         long window = XDefaultRootWindow(display);
 
-        Pointer<Byte> pString = Pointer.pointerToCString("b");
+        Pointer<Byte> pString = Pointer.pointerToCString("XF86AudioPlay");
         byte keyCode = XKeysymToKeycode(display, XStringToKeysym(pString));
 
-        int modifiers = ControlMask | Mod1Mask;
+        int modifiers = 0;
         int ret = XGrabKey(display, keyCode, modifiers, window, true, GrabModeAsync, GrabModeAsync);
         if (ret == 0)
             System.out.println("aargh");
@@ -36,8 +36,11 @@ public class Test {
                 XNextEvent(display, ptr);
 
                 XEvent event = ptr.get();
+
+                System.out.println(keyCode + " " + event.type() + " " + event.xkey().keycode() + " " + event.xkey().state());
+
                 if (event.type() == KeyPress
-                        && event.xkey().keycode() == keyCode
+                        && (byte) event.xkey().keycode() == keyCode
                         && event.xkey().state() == modifiers) {
                     System.out.println("Fuck yeah");
                     XUngrabKey(display, keyCode, modifiers, window);
