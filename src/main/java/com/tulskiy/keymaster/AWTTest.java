@@ -1,18 +1,15 @@
 package com.tulskiy.keymaster;
 
+import com.sun.jna.Platform;
 import com.tulskiy.keymaster.common.Provider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
-import org.bridj.Platform;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Author: Denis Tulskiy
@@ -24,7 +21,7 @@ public class AWTTest {
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
         final Provider provider;
-        if (Platform.isUnix()) {
+        if (Platform.isX11()) {
             provider = new X11Provider();
         } else if (Platform.isWindows()) {
             provider = new WindowsProvider();

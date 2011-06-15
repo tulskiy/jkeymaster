@@ -1,15 +1,16 @@
 package com.tulskiy.keymaster.windows;
 
-import org.bridj.BridJ;
-import org.bridj.Pointer;
-import org.bridj.ann.Library;
+import com.sun.jna.*;
 
 /**
  * Author: Denis Tulskiy
- * Date: 6/6/11
+ * Date: 6/15/11
  */
-@Library("user32")
 public class User32 {
+    static {
+        Native.register("user32");
+    }
+
     public static final int MOD_ALT = 0x0001;
     public static final int MOD_CONTROL = 0x0002;
     public static final int MOD_NOREPEAT = 0x4000;
@@ -25,16 +26,97 @@ public class User32 {
     public static final int WM_KEYLAST = 0x0109;
     public static final int PM_REMOVE = 0x0001;
 
-    static {
-        BridJ.register();
-    }
-
     public static native boolean RegisterHotKey(Pointer hWnd, int id, int fsModifiers, int vk);
 
     public static native boolean UnregisterHotKey(Pointer hWnd, int id);
 
-    public static native int GetMessage(Pointer<MSG> lpMsg, Pointer hWnd, int wMsgFilterMin, int wMsgFilterMax);
+    public static native boolean PeekMessage(MSG lpMsg, Pointer hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
 
-    public static native int PeekMessage(Pointer<MSG> lpMsg, Pointer hWnd, int wMsgFilterMin, int wMsgFilterMax, int wRemoveMsg);
+    /**
+     * Defines the x- and y-coordinates of a point.
+     */
+    public static class POINT extends Structure {
+        public int x, y;
+
+        public POINT() {
+        }
+
+        public POINT(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    public static class MSG extends Structure {
+        public HWND hWnd;
+        public int message;
+        public WPARAM wParam;
+        public LPARAM lParam;
+        public int time;
+        public POINT pt;
+    }
+
+    /**
+     * Handle to a window.
+     */
+    public static class HWND extends PointerType {
+    }
+
+    /**
+     * Unsigned INT_PTR.
+     */
+    public static class UINT_PTR extends IntegerType {
+        public UINT_PTR() {
+            super(Pointer.SIZE);
+        }
+
+        public UINT_PTR(long value) {
+            super(Pointer.SIZE, value);
+        }
+
+        public Pointer toPointer() {
+            return Pointer.createConstant(longValue());
+        }
+    }
+
+    /**
+     * Message parameter.
+     */
+    public static class WPARAM extends UINT_PTR {
+        public WPARAM() {
+            this(0);
+        }
+
+        public WPARAM(long value) {
+            super(value);
+        }
+    }
+
+    /**
+     * Signed long type for pointer precision.
+     * Use when casting a pointer to a long to perform pointer arithmetic.
+     */
+    public static class LONG_PTR extends IntegerType {
+        public LONG_PTR() {
+            this(0);
+        }
+
+        public LONG_PTR(long value) {
+            super(Pointer.SIZE, value);
+        }
+    }
+
+    /**
+	 * Message parameter.
+	 */
+	public static class LPARAM extends LONG_PTR {
+		public LPARAM() {
+			this(0);
+		}
+
+		public LPARAM(long value) {
+			super(value);
+		}
+	}
+
 }
-

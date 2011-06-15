@@ -1,9 +1,9 @@
 package com.tulskiy.keymaster;
 
+import com.sun.jna.Platform;
 import com.tulskiy.keymaster.common.Provider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
-import org.bridj.Platform;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -17,7 +17,7 @@ public class ProviderTest {
     public static void main(String[] args) {
         final Provider provider;
 
-        if (Platform.isUnix()) {
+        if (Platform.isX11()) {
             provider = new X11Provider();
         } else if (Platform.isWindows()) {
             provider = new WindowsProvider();

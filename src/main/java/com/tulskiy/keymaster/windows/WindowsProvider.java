@@ -1,7 +1,6 @@
 package com.tulskiy.keymaster.windows;
 
 import com.tulskiy.keymaster.common.Provider;
-import org.bridj.Pointer;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -43,7 +42,7 @@ public class WindowsProvider implements Provider {
     public void init() {
         Runnable runnable = new Runnable() {
             public void run() {
-                Pointer<MSG> msgPointer = Pointer.allocate(MSG.class);
+                MSG msg = new MSG();
                 listen = true;
                 while (listen) {
                     synchronized (reset) {
@@ -78,11 +77,10 @@ public class WindowsProvider implements Provider {
                         toRegister.clear();
                     }
 
-                    while (PeekMessage(msgPointer, null, 0, 0, PM_REMOVE) != 0) {
-                        MSG msg = msgPointer.get();
-                        System.out.println(msg.wParam());
-                        if (msg.message() == WM_HOTKEY) {
-                            int id = msg.wParam();
+                    while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
+                        System.out.println(msg.wParam);
+                        if (msg.message == WM_HOTKEY) {
+                            int id = msg.wParam.intValue();
                             ActionListener listener = idToListener.get(id);
 
                             if (listener != null) {
