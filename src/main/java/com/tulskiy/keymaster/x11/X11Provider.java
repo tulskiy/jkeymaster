@@ -1,7 +1,6 @@
 package com.tulskiy.keymaster.x11;
 
 import com.tulskiy.keymaster.common.Provider;
-import org.bridj.Pointer;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -18,8 +17,8 @@ import static com.tulskiy.keymaster.x11.LibX11.*;
  */
 public class X11Provider implements Provider {
     private Map<KeyStroke, ActionListener> listeners = Collections.synchronizedMap(new HashMap<KeyStroke, ActionListener>());
-    private Pointer<LibX11.XDisplay> display;
-    private long window;
+    private Display display;
+    private Window window;
     private boolean initialized = false;
     public boolean listening;
     public Thread thread;
@@ -28,7 +27,7 @@ public class X11Provider implements Provider {
         if (!initialized) {
             logger.info("Loading X11 global hotkey provider");
             display = XOpenDisplay(null);
-            XSetErrorHandler(Pointer.pointerTo(new ErrorHandler()));
+            XSetErrorHandler(new ErrorHandler());
             window = XDefaultRootWindow(display);
             initialized = true;
         }
@@ -36,18 +35,17 @@ public class X11Provider implements Provider {
         Runnable runnable = new Runnable() {
             public void run() {
                 listening = true;
-                Pointer<XEvent> ptr = Pointer.allocate(XEvent.class);
+                XEvent event = new XEvent();
 
                 while (listening) {
                     while (XPending(display) > 0) {
-                        XNextEvent(display, ptr);
-
-                        XEvent event = ptr.get();
-                        if (event.type() == KeyPress) {
+                        XNextEvent(display, event);
+                        if (event.type == KeyPress) {
+                            XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
                             for (Map.Entry<KeyStroke, ActionListener> entry : listeners.entrySet()) {
                                 KeyStroke keyStroke = entry.getKey();
-                                int state = event.xkey().state() & (ShiftMask|ControlMask|Mod1Mask|Mod4Mask);
-                                if (Converter.getCode(keyStroke, display) == event.xkey().keycode() &&
+                                int state = xkey.state & (ShiftMask|ControlMask|Mod1Mask|Mod4Mask);
+                                if (Converter.getCode(keyStroke, display) == xkey.keycode &&
                                         state == Converter.getModifiers(keyStroke)) {
                                     logger.info("Received event for KeyCode: " + keyStroke.toString());
                                     entry.getValue().actionPerformed(new ActionEvent(keyStroke, 0, ""));
@@ -130,12 +128,13 @@ public class X11Provider implements Provider {
         }
     }
 
-    class ErrorHandler extends XErrorHandler {
-        @Override
-        public int apply(Pointer<XDisplay> DisplayPtr1, Pointer<XErrorEvent> XErrorEventPtr1) {
-            Pointer<Byte> ret = Pointer.allocateBytes(1024);
-            XGetErrorText(DisplayPtr1, XErrorEventPtr1.get().error_code(), ret, 1024);
-            logger.warning("Error: " + ret.getString(Pointer.StringType.C));
+    class ErrorHandler implements XErrorHandler {
+        public int apply(Display display, XErrorEvent errorEvent) {
+            byte[] buf = new byte[1024];
+            XGetErrorText(display, errorEvent.error_code, buf, buf.length);
+            int len = 0;
+            while (buf[len] != 0) len++;
+            logger.warning("Error: " + new String(buf, 0, len));
             return 0;
         }
     }

@@ -1,10 +1,7 @@
 package com.tulskiy.keymaster.x11;
 
-import org.bridj.Pointer;
-
 import javax.swing.*;
 import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.util.HashMap;
 
 import static com.tulskiy.keymaster.x11.KeySymDef.*;
@@ -72,7 +69,7 @@ public class Converter {
         put(VK_BEGIN, XK_KP_Begin);
     }};
 
-    public static byte getCode(KeyStroke keyStroke, Pointer<XDisplay> display) {
+    public static byte getCode(KeyStroke keyStroke, Display display) {
         int code = keyStroke.getKeyCode();
 
         int ret = -1;
