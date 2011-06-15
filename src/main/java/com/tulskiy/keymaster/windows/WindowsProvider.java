@@ -78,7 +78,6 @@ public class WindowsProvider implements Provider {
                     }
 
                     while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
-                        System.out.println(msg.wParam);
                         if (msg.message == WM_HOTKEY) {
                             int id = msg.wParam.intValue();
                             ActionListener listener = idToListener.get(id);

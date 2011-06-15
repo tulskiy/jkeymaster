@@ -1,6 +1,7 @@
 package com.tulskiy.keymaster.windows;
 
 import com.sun.jna.*;
+import com.sun.jna.win32.W32APIOptions;
 
 /**
  * Author: Denis Tulskiy
@@ -8,7 +9,7 @@ import com.sun.jna.*;
  */
 public class User32 {
     static {
-        Native.register("user32");
+        Native.register(NativeLibrary.getInstance("user32", W32APIOptions.DEFAULT_OPTIONS));
     }
 
     public static final int MOD_ALT = 0x0001;
