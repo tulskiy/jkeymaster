@@ -1,9 +1,6 @@
 package com.tulskiy.keymaster.x11;
 
 
-import com.sun.org.apache.xerces.internal.impl.dv.xs.AnyURIDV;
-import com.tulskiy.keymaster.x11.LibX11;
-import com.tulskiy.keymaster.x11.XEvent;
 import org.bridj.Pointer;
 
 import java.awt.*;

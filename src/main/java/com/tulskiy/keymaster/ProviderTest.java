@@ -4,7 +4,6 @@ import com.tulskiy.keymaster.common.Provider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
 import org.bridj.Platform;
-import sun.awt.PlatformFont;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
