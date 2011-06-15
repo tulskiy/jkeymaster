@@ -38,14 +38,6 @@ public class User32 {
      */
     public static class POINT extends Structure {
         public int x, y;
-
-        public POINT() {
-        }
-
-        public POINT(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
     }
 
     public static class MSG extends Structure {

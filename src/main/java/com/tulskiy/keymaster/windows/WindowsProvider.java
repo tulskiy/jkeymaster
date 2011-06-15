@@ -37,6 +37,7 @@ public class WindowsProvider implements Provider {
     private final Map<KeyStroke, ActionListener> toRegister = new HashMap<KeyStroke, ActionListener>();
     private boolean listen;
     private Boolean reset = false;
+    private final Object lock = new Object();
     private Thread thread;
 
     public void init() {
@@ -45,7 +46,7 @@ public class WindowsProvider implements Provider {
                 MSG msg = new MSG();
                 listen = true;
                 while (listen) {
-                    synchronized (reset) {
+                    synchronized (lock) {
                         if (reset) {
                             for (Integer id : idToListener.keySet()) {
                                 UnregisterHotKey(null, id);
@@ -54,10 +55,9 @@ public class WindowsProvider implements Provider {
                             idToListener.clear();
                             idToKeyStroke.clear();
                             reset = false;
+                            lock.notify();
                         }
-                    }
 
-                    synchronized (toRegister) {
                         for (Map.Entry<KeyStroke, ActionListener> entry : toRegister.entrySet()) {
                             int id = idSeq++;
                             KeyStroke keyCode = entry.getKey();
@@ -123,13 +123,20 @@ public class WindowsProvider implements Provider {
     }
 
     public void register(KeyStroke keyCode, ActionListener listener) {
-        synchronized (toRegister) {
+        synchronized (lock) {
             toRegister.put(keyCode, listener);
         }
     }
 
     public void reset() {
-        reset = true;
+        synchronized (lock) {
+            reset = true;
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void stop() {
