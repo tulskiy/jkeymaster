@@ -20,14 +20,15 @@ public class X11Provider implements Provider {
     private Display display;
     private Window window;
     private boolean initialized = false;
-    public boolean listening;
-    public Thread thread;
+    private boolean listening;
+    private Thread thread;
+    private ErrorHandler errorHandler = new ErrorHandler();
 
     public void init() {
         if (!initialized) {
             logger.info("Loading X11 global hotkey provider");
             display = XOpenDisplay(null);
-            XSetErrorHandler(new ErrorHandler());
+            XSetErrorHandler(errorHandler);
             window = XDefaultRootWindow(display);
             initialized = true;
         }
