@@ -13,6 +13,12 @@ public class CarbonLib {
         Native.register(NativeLibrary.getInstance("Carbon"));
     }
 
+    public static final OSStatus noErr = new OSStatus(0);
+    public static final OSStatus eventAlreadyPostedErr = new OSStatus(-9860);
+    public static final OSStatus eventTargetBusyErr = new OSStatus(-9861);
+    public static final OSStatus eventClassInvalidErr = new OSStatus(-9862); //Note More on page 213 - Carbon_Event_Manager_Ref.pdf
+
+
     public static native Pointer GetApplicationEventTarget();
 
     /* OSStatus InstallEventHandler(EventTargetRef inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, const EventTypeSpec* inList, void* inUserData, EventHandlerRef *outRef) */
@@ -35,7 +41,7 @@ public class CarbonLib {
 
 
     /* typedef SInt32 OSStatus */
-    public class OSStatus extends IntegerType {
+    public static class OSStatus extends IntegerType {
         public OSStatus() {
             this(0);
         }
@@ -45,13 +51,8 @@ public class CarbonLib {
         }
     }
 
-    OSStatus noErr = new OSStatus(0);
-    OSStatus eventAlreadyPostedErr = new OSStatus(-9860);
-    OSStatus eventTargetBusyErr = new OSStatus(-9861);
-    OSStatus eventClassInvalidErr = new OSStatus(-9862); //Note More on page 213 - Carbon_Event_Manager_Ref.pdf
-
     /* Don't see defined anywhere, but used where integer is expected. */
-    public class ItemCount extends IntegerType {
+    public static class ItemCount extends IntegerType {
         public ItemCount() {
             this(0);
         }
@@ -62,24 +63,24 @@ public class CarbonLib {
     }
 
     /* EventTypeSpec */ /* struct EventTypeSpec { UInt32 eventClass; UInt32 eventKind; }; typedef struct EventTypeSpec EventTypeSpec */
-    public class EventTypeSpec extends Structure {
+    public static class EventTypeSpec extends Structure {
         public int eventClass;
         public int eventKind;
     }
 
     /* EventHotKeyID: struct EventHotKeyID { OSType signature; UInt32 id; }; */
-    public class EventHotKeyID extends Structure {
+    public static class EventHotKeyID extends Structure {
         public int signature;
         public int id;
     }
 
 
-    public interface EventHandlerUPP extends EventHandlerProcPtr {
+    public static interface EventHandlerUPP extends EventHandlerProcPtr {
 
     }
 
     /* typedef OSStatus (*EventHandlerProcPtr) ( EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void * inUserData ); */
-    interface EventHandlerProcPtr extends Callback {
+    static interface EventHandlerProcPtr extends Callback {
         public OSStatus callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData);
         //OSStatus callback(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, Pointer inUserData); }
 
