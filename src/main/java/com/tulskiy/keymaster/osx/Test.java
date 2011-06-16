@@ -1,7 +1,11 @@
 package com.tulskiy.keymaster.osx;
 
 import com.sun.jna.Pointer;
+import com.sun.jna.PointerType;
 import com.sun.jna.ptr.PointerByReference;
+
+import javax.swing.*;
+
 import static com.tulskiy.keymaster.osx.CarbonLib.*;
 
 /**
@@ -14,27 +18,27 @@ public class Test {
 
     static final int kEventClassKeyboard = ((int) 'k' << 24) + ((int) 'e' << 16) + ((int) 'y' << 8) + (int) 'b';
 
-    static final int cmdKey     = 0x0100;
-    static final int shiftKey   = 0x0200;
-    static final int optionKey  = 0x0800;
+    static final int cmdKey = 0x0100;
+    static final int shiftKey = 0x0200;
+    static final int optionKey = 0x0800;
     static final int controlKey = 0x1000;
 
     public static void main(String[] args) {
-        try
-        {
+        try {
             // Our events handlers we want to listen to
             //EventHandlerRef		sHandler, fHandler;
             PointerByReference fHandlerRef;
             PointerByReference gMyHotKeyRef;
-            fHandlerRef  = new PointerByReference();
+            fHandlerRef = new PointerByReference();
             gMyHotKeyRef = new PointerByReference();
 
-            EventHandlerUPP myKeyListener = new EventHandlerUPP() {
+            EventHandlerProcPtr myKeyListener = new EventHandlerProcPtr() {
                 public OSStatus callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData) {
                     System.out.println("Fuck Yeah");
                     return noErr;
                 }
             };
+
 
             // use an event that isn't monitored just so we have a valid EventTypeSpec to install
             //EventTypeSpec	kEvents[] = { { kEventClassCommand, kEventCommandUpdateStatus } };
@@ -45,35 +49,39 @@ public class Test {
             // install an event handler to detect clicks on the main window to tell the application which
             // events to track/stop tracking
             //InstallApplicationEventHandler( CmdHandler, GetEventTypeCount( kEvents ), kEvents, 0, &fHandler );
-            CarbonLib.OSStatus status = Lib.InstallEventHandler(Lib.GetApplicationEventTarget(), myKeyListener, new CarbonLib.ItemCount(1), eventTypes, null, fHandlerRef); //fHandlerRef
+            CarbonLib.OSStatus status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), Lib.NewEventHandlerUPP(myKeyListener), new CarbonLib.ItemCount(1), eventTypes, null, fHandlerRef); //fHandlerRef
 
-            System.out.println("InstallEventHandler: "+status);
+            System.out.println("InstallEventHandler: " + status);
 
-            System.out.println(fHandlerRef.getValue()==null?"2. NULL":"2. Not NULL");
+            System.out.println(fHandlerRef.getValue() == null ? "2. NULL" : "2. Not NULL");
             System.out.println(fHandlerRef.getValue());
 
-            EventHotKeyID gMyHotKeyID = new EventHotKeyID();
+            EventHotKeyID.ByValue gMyHotKeyID = new EventHotKeyID.ByValue();
             gMyHotKeyID.id = 1;
-            gMyHotKeyID.signature = ((int)'h'<< 24) +((int)'t' << 16) +((int)'k' << 8) +'1';
+            gMyHotKeyID.signature = ((int) 'h' << 24) + ((int) 't' << 16) + ((int) 'k' << 8) + '1';
 
 
             // extern OSStatus RegisterEventHotKey(UInt32 inHotKeyCode, UInt32 inHotKeyModifiers, EventHotKeyID inHotKeyID,
             //                 EventTargetRef inTarget, OptionBits inOptions, EventHotKeyRef *  outRef)
             // HotKey = cmdKey+controlKey+SPACE
-            status = Lib.RegisterEventHotKey(49, cmdKey + controlKey, gMyHotKeyID, Lib.GetApplicationEventTarget(), 0, gMyHotKeyRef);
+            status = Lib.RegisterEventHotKey(9, shiftKey + controlKey, gMyHotKeyID, Lib.GetEventDispatcherTarget(), 0, gMyHotKeyRef);
 
-            System.out.println("RegisterHotKey: "+status);
+            System.out.println("RegisterHotKey: " + status);
             System.out.println(gMyHotKeyRef.getValue());
 
             System.out.println("Event handers installed");
 
-            while (true) {
-                Thread.sleep(1000);
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    JFrame frame = new JFrame();
+                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                    frame.setSize(100, 100);
+                    frame.setLocationRelativeTo(null);
+                    frame.setVisible(true);
+                }
+            });
 
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             System.err.println(e);
             e.printStackTrace();
         }

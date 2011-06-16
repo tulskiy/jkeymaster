@@ -23,11 +23,11 @@ public interface CarbonLib extends Library {
 
     /* OSStatus InstallEventHandler(EventTargetRef inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, const EventTypeSpec* inList, void* inUserData, EventHandlerRef *outRef) */
 
-    public OSStatus InstallEventHandler(Pointer inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, EventTypeSpec[] inList, Pointer inUserData, PointerByReference outRef);
+    public OSStatus InstallEventHandler(Pointer inTarget, Pointer inHandler, ItemCount inNumTypes, EventTypeSpec[] inList, Pointer inUserData, PointerByReference outRef);
 
-    public OSStatus RegisterEventHotKey(int inHotKeyCode, int inHotKeyModifiers, EventHotKeyID inHotKeyID, Pointer inTarget, int inOptions, PointerByReference outRef);
+    public OSStatus RegisterEventHotKey(int inHotKeyCode, int inHotKeyModifiers, EventHotKeyID.ByValue inHotKeyID, Pointer inTarget, int inOptions, PointerByReference outRef);
 
-    public EventHandlerUPP NewEventHandlerUPP(EventHandlerProcPtr userRoutine);
+    public Pointer NewEventHandlerUPP(EventHandlerProcPtr userRoutine);
 
     public Pointer GetEventMonitorTarget();
 
@@ -72,15 +72,19 @@ public interface CarbonLib extends Library {
     public static class EventHotKeyID extends Structure {
         public int signature;
         public int id;
+
+        public static class ByValue extends EventHotKeyID implements Structure.ByValue {
+
+        }
     }
 
 
-    public static interface EventHandlerUPP extends EventHandlerProcPtr {
+    public static interface EventHandlerUPP {
 
     }
 
     /* typedef OSStatus (*EventHandlerProcPtr) ( EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void * inUserData ); */
-    static interface EventHandlerProcPtr extends Callback {
+    public static interface EventHandlerProcPtr extends Callback {
         public OSStatus callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData);
         //OSStatus callback(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, Pointer inUserData); }
 
