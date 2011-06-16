@@ -19,6 +19,8 @@ public interface CarbonLib extends Library {
 
     public Pointer GetApplicationEventTarget();
 
+    public Pointer GetEventDispatcherTarget();
+
     /* OSStatus InstallEventHandler(EventTargetRef inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, const EventTypeSpec* inList, void* inUserData, EventHandlerRef *outRef) */
 
     public OSStatus InstallEventHandler(Pointer inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, EventTypeSpec[] inList, Pointer inUserData, PointerByReference outRef);

@@ -31,6 +31,7 @@ public class Test {
 
             EventHandlerUPP myKeyListener = new EventHandlerUPP() {
                 public OSStatus callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData) {
+                    System.out.println("Fuck Yeah");
                     return noErr;
                 }
             };
@@ -59,12 +60,16 @@ public class Test {
             // extern OSStatus RegisterEventHotKey(UInt32 inHotKeyCode, UInt32 inHotKeyModifiers, EventHotKeyID inHotKeyID,
             //                 EventTargetRef inTarget, OptionBits inOptions, EventHotKeyRef *  outRef)
             // HotKey = cmdKey+controlKey+SPACE
-            status = Lib.RegisterEventHotKey(49, cmdKey+controlKey, gMyHotKeyID, Lib.GetApplicationEventTarget(), 0, gMyHotKeyRef);
+            status = Lib.RegisterEventHotKey(49, cmdKey + controlKey, gMyHotKeyID, Lib.GetApplicationEventTarget(), 0, gMyHotKeyRef);
 
             System.out.println("RegisterHotKey: "+status);
             System.out.println(gMyHotKeyRef.getValue());
 
             System.out.println("Event handers installed");
+
+            while (true) {
+                Thread.sleep(1000);
+            }
 
         }
         catch (Exception e)
