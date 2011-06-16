@@ -25,7 +25,9 @@ public class KeyMap {
         put(VK_9, 25);
         put(VK_0, 29);
         put(VK_MINUS, 27);
+        put(VK_UNDERSCORE, 27);
         put(VK_PLUS, 24);
+        put(VK_EQUALS, 24);
         put(VK_BACK_SPACE, 51);
         put(VK_TAB, 48);
         put(VK_Q, 12);
@@ -51,6 +53,7 @@ public class KeyMap {
         put(VK_K, 40);
         put(VK_L, 37);
         put(VK_COLON, 41);
+        put(VK_SEMICOLON, 41);
         put(VK_QUOTE, 39);
         put(VK_ENTER, 36);
         put(VK_Z, 6);
@@ -60,8 +63,8 @@ public class KeyMap {
         put(VK_B, 11);
         put(VK_N, 45);
         put(VK_M, 46);
-        put(VK_PERIOD, 43);
-        put(VK_COMMA, 47);
+        put(VK_COMMA, 43);
+        put(VK_PERIOD, 47);
         put(VK_SLASH, 44);
         put(VK_SPACE, 49);
         put(VK_F1, 122);
@@ -78,6 +81,7 @@ public class KeyMap {
         put(VK_F12, 111);
         put(VK_ESCAPE, 53);
         put(VK_INSERT, 114);
+        put(VK_HELP, 114);
         put(VK_HOME, 115);
         put(VK_PAGE_UP, 116);
         put(VK_DELETE, 117);
@@ -103,6 +107,7 @@ public class KeyMap {
         put(VK_NUMPAD7, 89);
         put(VK_NUMPAD8, 91);
         put(VK_NUMPAD9, 92);
+        put(VK_DECIMAL, 65);
     }};
 
     public static int getKeyCode(KeyStroke keyStroke) {

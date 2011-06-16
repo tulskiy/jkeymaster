@@ -61,6 +61,7 @@ public class CarbonProvider implements Provider {
     }
 
     public void reset() {
+        logger.info("Resetting hotkeys");
         for (PointerByReference ptr : idToHandler.values()) {
             int ret = Lib.UnregisterEventHotKey(ptr.getValue());
             if (ret != 0) {
@@ -92,6 +93,7 @@ public class CarbonProvider implements Provider {
             return;
         }
 
+        logger.info("Registered hotkey: " + keyCode);
         idToHandler.put(id, gMyHotKeyRef);
         idToKeyStroke.put(id, keyCode);
         idToListener.put(id, listener);
