@@ -44,7 +44,7 @@ public class Test {
             // install an event handler to detect clicks on the main window to tell the application which
             // events to track/stop tracking
             //InstallApplicationEventHandler( CmdHandler, GetEventTypeCount( kEvents ), kEvents, 0, &fHandler );
-            CarbonLib.OSStatus status = InstallEventHandler(GetApplicationEventTarget(), myKeyListener, new CarbonLib.ItemCount(1), eventTypes, null, fHandlerRef); //fHandlerRef
+            CarbonLib.OSStatus status = Lib.InstallEventHandler(Lib.GetApplicationEventTarget(), myKeyListener, new CarbonLib.ItemCount(1), eventTypes, null, fHandlerRef); //fHandlerRef
 
             System.out.println("InstallEventHandler: "+status);
 
@@ -59,7 +59,7 @@ public class Test {
             // extern OSStatus RegisterEventHotKey(UInt32 inHotKeyCode, UInt32 inHotKeyModifiers, EventHotKeyID inHotKeyID,
             //                 EventTargetRef inTarget, OptionBits inOptions, EventHotKeyRef *  outRef)
             // HotKey = cmdKey+controlKey+SPACE
-            status = RegisterEventHotKey(49, cmdKey+controlKey, gMyHotKeyID, GetApplicationEventTarget(), 0, gMyHotKeyRef);
+            status = Lib.RegisterEventHotKey(49, cmdKey+controlKey, gMyHotKeyID, Lib.GetApplicationEventTarget(), 0, gMyHotKeyRef);
 
             System.out.println("RegisterHotKey: "+status);
             System.out.println(gMyHotKeyRef.getValue());

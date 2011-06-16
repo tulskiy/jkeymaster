@@ -8,10 +8,8 @@ import com.sun.jna.ptr.PointerByReference;
  * Date: 6/15/11
  */
 
-public class CarbonLib {
-    static {
-        Native.register(NativeLibrary.getInstance("Carbon"));
-    }
+public interface CarbonLib extends Library {
+    public static CarbonLib Lib = (CarbonLib) Native.loadLibrary("Carbon", CarbonLib.class);
 
     public static final OSStatus noErr = new OSStatus(0);
     public static final OSStatus eventAlreadyPostedErr = new OSStatus(-9860);
@@ -19,29 +17,29 @@ public class CarbonLib {
     public static final OSStatus eventClassInvalidErr = new OSStatus(-9862); //Note More on page 213 - Carbon_Event_Manager_Ref.pdf
 
 
-    public static native Pointer GetApplicationEventTarget();
+    public Pointer GetApplicationEventTarget();
 
     /* OSStatus InstallEventHandler(EventTargetRef inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, const EventTypeSpec* inList, void* inUserData, EventHandlerRef *outRef) */
 
-    public static native OSStatus InstallEventHandler(Pointer inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, final EventTypeSpec[] inList, Pointer inUserData, PointerByReference outRef);
+    public OSStatus InstallEventHandler(Pointer inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, EventTypeSpec[] inList, Pointer inUserData, PointerByReference outRef);
 
-    public static native OSStatus RegisterEventHotKey(int inHotKeyCode, int inHotKeyModifiers, EventHotKeyID inHotKeyID, Pointer inTarget, int inOptions, PointerByReference outRef);
+    public OSStatus RegisterEventHotKey(int inHotKeyCode, int inHotKeyModifiers, EventHotKeyID inHotKeyID, Pointer inTarget, int inOptions, PointerByReference outRef);
 
-    public static native EventHandlerUPP NewEventHandlerUPP(EventHandlerProcPtr userRoutine);
+    public EventHandlerUPP NewEventHandlerUPP(EventHandlerProcPtr userRoutine);
 
-    public static native Pointer GetEventMonitorTarget();
+    public Pointer GetEventMonitorTarget();
 
-    public static native OSStatus RemoveEventHandler(Pointer inHandlerRef);
+    public OSStatus RemoveEventHandler(Pointer inHandlerRef);
 
     /*extern OSStatus AddEventTypesToHandler(
       EventHandlerRef        inHandlerRef,
       ItemCount              inNumTypes,
       const EventTypeSpec *  inList)*/
-    public static native OSStatus AddEventTypesToHandler(Pointer inHandlerRef, ItemCount inNumTypes, EventTypeSpec inList);
+    public OSStatus AddEventTypesToHandler(Pointer inHandlerRef, ItemCount inNumTypes, EventTypeSpec inList);
 
 
     /* typedef SInt32 OSStatus */
-    public static class OSStatus extends IntegerType {
+    public class OSStatus extends IntegerType {
         public OSStatus() {
             this(0);
         }
@@ -52,7 +50,7 @@ public class CarbonLib {
     }
 
     /* Don't see defined anywhere, but used where integer is expected. */
-    public static class ItemCount extends IntegerType {
+    public  class ItemCount extends IntegerType {
         public ItemCount() {
             this(0);
         }
@@ -63,7 +61,7 @@ public class CarbonLib {
     }
 
     /* EventTypeSpec */ /* struct EventTypeSpec { UInt32 eventClass; UInt32 eventKind; }; typedef struct EventTypeSpec EventTypeSpec */
-    public static class EventTypeSpec extends Structure {
+    public  class EventTypeSpec extends Structure {
         public int eventClass;
         public int eventKind;
     }
