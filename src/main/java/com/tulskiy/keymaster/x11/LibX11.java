@@ -24,14 +24,6 @@ public class LibX11 {
     public static final int Mod4Mask = (1 << 6);
     public static final int Mod5Mask = (1 << 7);
 
-    public static final int XF86AUDIO_VOLUP = 176;
-    public static final int XF86AUDIO_VOLDN = 174;
-    public static final int XF86AUDIO_MEDIA = 129;
-    public static final int XF86AUDIO_PLAY = 162;
-    public static final int XF86AUDIO_STOP = 164;
-    public static final int XF86AUDIO_NEXT = 153;
-    public static final int XF86AUDIO_PREV = 144;
-
     public static native Display XOpenDisplay(String name);
 
     public static native Window XDefaultRootWindow(Display display);

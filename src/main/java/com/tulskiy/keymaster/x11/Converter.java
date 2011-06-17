@@ -67,6 +67,10 @@ public class Converter {
         put(VK_ADD, XK_KP_Add);
         put(VK_SUBTRACT, XK_KP_Subtract);
         put(VK_BEGIN, XK_KP_Begin);
+        put(XF86XK_AudioNext, XF86XK_AudioNext);
+        put(XF86XK_AudioPlay, XF86XK_AudioPlay);
+        put(XF86XK_AudioPrev, XF86XK_AudioPrev);
+        put(XF86XK_AudioStop, XF86XK_AudioStop);
     }};
 
     public static byte getCode(KeyStroke keyStroke, Display display) {

@@ -1,5 +1,6 @@
 package com.tulskiy.keymaster.x11;
 
+import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.tulskiy.keymaster.x11.LibX11.*;
+import static com.tulskiy.keymaster.x11.KeySymDef.*;
 
 /**
  * Author: Denis Tulskiy
@@ -82,9 +84,6 @@ public class X11Provider implements Provider {
         }
     }
 
-    public void registerMediaKeyListener(ActionListener listener) {
-    }
-
     public void register(KeyStroke keyCode, ActionListener listener) {
         logger.info("Registering hotkey: " + keyCode.toString());
         byte code = Converter.getCode(keyCode, display);
@@ -106,6 +105,28 @@ public class X11Provider implements Provider {
             XGrabKey(display, code, flags, window, true, GrabModeAsync, GrabModeAsync);
         }
         listeners.put(keyCode, listener);
+    }
+
+    public void register(MediaKey mediaKey, ActionListener listener) {
+        logger.info("Registering media hotkey: " + mediaKey);
+
+        int code = 0;
+        switch (mediaKey) {
+            case MEDIA_NEXT_TRACK:
+                code = XF86XK_AudioNext;
+                break;
+            case MEDIA_PLAY_PAUSE:
+                code = XF86XK_AudioPlay;
+                break;
+            case MEDIA_PREV_TRACK:
+                code = XF86XK_AudioPrev;
+                break;
+            case MEDIA_STOP:
+                code = XF86XK_AudioStop;
+                break;
+        }
+        XGrabKey(display, code, 0, window, true, GrabModeAsync, GrabModeAsync);
+        listeners.put(KeyStroke.getKeyStroke(code, 0), listener);
     }
 
     public void reset() {

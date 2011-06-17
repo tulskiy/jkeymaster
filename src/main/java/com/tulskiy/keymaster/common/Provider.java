@@ -15,9 +15,9 @@ public interface Provider {
 
     public void stop();
 
-    public void registerMediaKeyListener(ActionListener listener);
+    public void reset();
 
     public void register(KeyStroke keyCode, ActionListener listener);
 
-    public void reset();
+    public void register(MediaKey mediaKey, ActionListener listener);
 }

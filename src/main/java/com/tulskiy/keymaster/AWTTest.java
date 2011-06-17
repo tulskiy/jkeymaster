@@ -1,6 +1,7 @@
 package com.tulskiy.keymaster;
 
 import com.sun.jna.Platform;
+import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
@@ -42,8 +43,9 @@ public class AWTTest {
             }
         });
         frame.add(textField, BorderLayout.CENTER);
+        JPanel box = new JPanel(new GridLayout(2, 1));
         JButton grab = new JButton("Grab");
-        frame.add(grab, BorderLayout.PAGE_END);
+        box.add(grab);
         grab.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String text = textField.getText();
@@ -62,6 +64,20 @@ public class AWTTest {
             }
         });
 
+        JButton grabMedia = new JButton("Grab media keys");
+        grabMedia.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                provider.register(MediaKey.MEDIA_NEXT_TRACK, new MediaListener(MediaKey.MEDIA_NEXT_TRACK));
+                provider.register(MediaKey.MEDIA_PLAY_PAUSE, new MediaListener(MediaKey.MEDIA_PLAY_PAUSE));
+                provider.register(MediaKey.MEDIA_PREV_TRACK, new MediaListener(MediaKey.MEDIA_PREV_TRACK));
+                provider.register(MediaKey.MEDIA_STOP, new MediaListener(MediaKey.MEDIA_STOP));
+            }
+        });
+        box.add(grabMedia);
+
+
+        frame.add(box, BorderLayout.PAGE_END);
+
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -71,8 +87,24 @@ public class AWTTest {
             }
         });
 
-        frame.setSize(300, 100);
+        frame.setSize(300, 150);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+    }
+
+    private static class MediaListener implements ActionListener {
+        private MediaKey key;
+
+        private MediaListener(MediaKey key) {
+            this.key = key;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    JOptionPane.showMessageDialog(null, "Hooray, media key: " + key);
+                }
+            });
+        }
     }
 }

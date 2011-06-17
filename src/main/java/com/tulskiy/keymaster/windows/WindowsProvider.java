@@ -1,5 +1,6 @@
 package com.tulskiy.keymaster.windows;
 
+import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
@@ -100,32 +101,30 @@ public class WindowsProvider implements Provider {
         thread.start();
     }
 
-    public void registerMediaKeyListener(ActionListener listener) {
-        registerMediaKeys();
-    }
-
-    private void registerMediaKeys() {
-//        if (RegisterHotKey(null, id, 0, VK_MEDIA_NEXT_TRACK)) {
-//            mediaIds.put(MediaKey.MEDIA_NEXT_TRACK, id);
-//        }
-//        id = idSeq++;
-//        if (RegisterHotKey(null, id, 0, VK_MEDIA_PREV_TRACK)) {
-//            mediaIds.put(MediaKey.MEDIA_PREV_TRACK, id);
-//        }
-//        id = idSeq++;
-//        if (RegisterHotKey(null, id, 0, VK_MEDIA_PLAY_PAUSE)) {
-//            mediaIds.put(MediaKey.MEDIA_PLAY_PAUSE, id);
-//        }
-//        id = idSeq++;
-//        if (RegisterHotKey(null, id, 0, VK_MEDIA_STOP)) {
-//            mediaIds.put(MediaKey.MEDIA_STOP, id);
-//        }
-    }
-
     public void register(KeyStroke keyCode, ActionListener listener) {
         synchronized (lock) {
             toRegister.put(keyCode, listener);
         }
+    }
+
+    public void register(MediaKey mediaKey, ActionListener listener) {
+        int code = 0;
+        switch (mediaKey) {
+            case MEDIA_NEXT_TRACK:
+                code = VK_MEDIA_NEXT_TRACK;
+                break;
+            case MEDIA_PLAY_PAUSE:
+                code = VK_MEDIA_PLAY_PAUSE;
+                break;
+            case MEDIA_PREV_TRACK:
+                code = VK_MEDIA_PREV_TRACK;
+                break;
+            case MEDIA_STOP:
+                code = VK_MEDIA_STOP;
+                break;
+        }
+
+        register(KeyStroke.getKeyStroke(code, 0), listener);
     }
 
     public void reset() {

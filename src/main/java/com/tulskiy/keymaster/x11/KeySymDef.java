@@ -123,4 +123,9 @@ public class KeySymDef {
     public static final int XK_asciitilde = 0x007e;  /* U+007E TILDE */
 
     public static final int XK_Insert = 0xff63;  /* Insert, insert here */
+
+    public static final int XF86XK_AudioPlay = 0x1008FF14;  /* Start playing of audio >   */
+    public static final int XF86XK_AudioStop = 0x1008FF15;  /* Stop playing audio         */
+    public static final int XF86XK_AudioPrev = 0x1008FF16;  /* Previous track             */
+    public static final int XF86XK_AudioNext = 0x1008FF17;  /* Next track                 */
 }
