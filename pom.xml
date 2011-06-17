@@ -53,22 +53,12 @@
 
     <repositories>
         <repository>
-            <id>nativelibs4java</id>
-            <name>nativelibs4java Maven2 Repository</name>
-            <url>http://nativelibs4java.sourceforge.net/maven</url>
-        </repository>
-        <repository>
             <id>java.net.m2</id>
             <name>java.net m2 repo</name>
             <url>http://download.java.net/maven/2/</url>
         </repository>
     </repositories>
     <dependencies>
-        <dependency>
-            <groupId>com.nativelibs4java</groupId>
-            <artifactId>bridj</artifactId>
-            <version>0.4.2</version>
-        </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
