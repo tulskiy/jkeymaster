@@ -16,12 +16,19 @@ public class Test {
     static final int kEventHotKeyPressed = 5;
     static final int kEventHotKeyReleased = 6;
 
-    static final int kEventClassKeyboard = ((int) 'k' << 24) + ((int) 'e' << 16) + ((int) 'y' << 8) + (int) 'b';
+    private static final int kEventClassKeyboard = OS_TYPE("keyb");
+    private static final int typeEventHotKeyID = OS_TYPE("hkid"); /* EventHotKeyID*/
+    private static final int kEventParamDirectObject = OS_TYPE("----");
 
     static final int cmdKey = 0x0100;
     static final int shiftKey = 0x0200;
     static final int optionKey = 0x0800;
     static final int controlKey = 0x1000;
+
+    private static int OS_TYPE(String osType) {
+        byte[] bytes = osType.getBytes();
+        return bytes[0] << 24 + bytes[1] << 16 + bytes[2] << 8 + bytes[1];
+    }
 
     public static void main(String[] args) {
         try {
@@ -34,7 +41,9 @@ public class Test {
 
             EventHandlerProcPtr myKeyListener = new EventHandlerProcPtr() {
                 public OSStatus callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData) {
-                    System.out.println("Fuck Yeah");
+                    EventHotKeyID eventHotKeyID = new EventHotKeyID();
+                    Lib.GetEventParameter(inEvent, kEventParamDirectObject, typeEventHotKeyID, null, eventHotKeyID.size(), null, eventHotKeyID);
+                    System.out.println("Received event with id: " + eventHotKeyID.id);
                     return noErr;
                 }
             };

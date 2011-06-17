@@ -3,6 +3,8 @@ package com.tulskiy.keymaster.osx;
 import com.sun.jna.*;
 import com.sun.jna.ptr.PointerByReference;
 
+import java.nio.IntBuffer;
+
 /**
  * Author: Denis Tulskiy
  * Date: 6/15/11
@@ -29,6 +31,8 @@ public interface CarbonLib extends Library {
 
     public Pointer NewEventHandlerUPP(EventHandlerProcPtr userRoutine);
 
+    public int GetEventParameter(Pointer inEvent, int inName, int inDesiredType, Pointer outActualType, int inBufferSize, IntBuffer outActualSize, EventHotKeyID outData);
+
     public Pointer GetEventMonitorTarget();
 
     public OSStatus RemoveEventHandler(Pointer inHandlerRef);
@@ -52,7 +56,7 @@ public interface CarbonLib extends Library {
     }
 
     /* Don't see defined anywhere, but used where integer is expected. */
-    public  class ItemCount extends IntegerType {
+    public class ItemCount extends IntegerType {
         public ItemCount() {
             this(0);
         }
@@ -63,7 +67,7 @@ public interface CarbonLib extends Library {
     }
 
     /* EventTypeSpec */ /* struct EventTypeSpec { UInt32 eventClass; UInt32 eventKind; }; typedef struct EventTypeSpec EventTypeSpec */
-    public  class EventTypeSpec extends Structure {
+    public class EventTypeSpec extends Structure {
         public int eventClass;
         public int eventKind;
     }

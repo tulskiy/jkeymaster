@@ -3,6 +3,7 @@ package com.tulskiy.keymaster;
 import com.sun.jna.Platform;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
+import com.tulskiy.keymaster.osx.CarbonProvider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
 
@@ -26,6 +27,8 @@ public class AWTTest {
             provider = new X11Provider();
         } else if (Platform.isWindows()) {
             provider = new WindowsProvider();
+        } else if (Platform.isMac()) {
+            provider = new CarbonProvider();
         } else {
             System.out.println("No suitable provider!");
             return;
