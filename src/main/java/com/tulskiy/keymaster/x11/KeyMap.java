@@ -12,7 +12,7 @@ import static java.awt.event.KeyEvent.*;
  * Author: Denis Tulskiy
  * Date: 6/13/11
  */
-public class Converter {
+public class KeyMap {
     private static final HashMap<Integer, Integer> common = new HashMap<Integer, Integer>() {{
         put(VK_ESCAPE, XK_Escape);
         put(VK_BACK_SPACE, XK_BackSpace);

@@ -48,8 +48,8 @@ public class X11Provider implements Provider {
                             for (Map.Entry<KeyStroke, ActionListener> entry : listeners.entrySet()) {
                                 KeyStroke keyStroke = entry.getKey();
                                 int state = xkey.state & (ShiftMask|ControlMask|Mod1Mask|Mod4Mask);
-                                if (Converter.getCode(keyStroke, display) == xkey.keycode &&
-                                        state == Converter.getModifiers(keyStroke)) {
+                                if (KeyMap.getCode(keyStroke, display) == xkey.keycode &&
+                                        state == KeyMap.getModifiers(keyStroke)) {
                                     logger.info("Received event for KeyCode: " + keyStroke.toString());
                                     entry.getValue().actionPerformed(new ActionEvent(keyStroke, 0, ""));
                                 }
@@ -86,11 +86,11 @@ public class X11Provider implements Provider {
 
     public void register(KeyStroke keyCode, ActionListener listener) {
         logger.info("Registering hotkey: " + keyCode.toString());
-        byte code = Converter.getCode(keyCode, display);
+        byte code = KeyMap.getCode(keyCode, display);
         if (code == 0) {
             return;
         }
-        int modifiers = Converter.getModifiers(keyCode);
+        int modifiers = KeyMap.getModifiers(keyCode);
         for (int i = 0; i < 16; i++) {
             int flags = modifiers;
             if ((i & 1) != 0)
@@ -132,8 +132,8 @@ public class X11Provider implements Provider {
     public void reset() {
         logger.info("Reset hotkeys");
         for (KeyStroke keyStroke : listeners.keySet()) {
-            int modifiers = Converter.getModifiers(keyStroke);
-            byte code = Converter.getCode(keyStroke, display);
+            int modifiers = KeyMap.getModifiers(keyStroke);
+            byte code = KeyMap.getCode(keyStroke, display);
             for (int i = 0; i < 16; i++) {
                 int flags = modifiers;
                 if ((i & 1) != 0)
