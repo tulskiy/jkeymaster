@@ -18,13 +18,16 @@ public interface CarbonLib extends Library {
     public static final OSStatus eventTargetBusyErr = new OSStatus(-9861);
     public static final OSStatus eventClassInvalidErr = new OSStatus(-9862); //Note More on page 213 - Carbon_Event_Manager_Ref.pdf
 
+    public static final int cmdKey = 0x0100;
+    public static final int shiftKey = 0x0200;
+    public static final int optionKey = 0x0800;
+    public static final int controlKey = 0x1000;
 
     public Pointer GetApplicationEventTarget();
 
     public Pointer GetEventDispatcherTarget();
 
     /* OSStatus InstallEventHandler(EventTargetRef inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, const EventTypeSpec* inList, void* inUserData, EventHandlerRef *outRef) */
-
     public OSStatus InstallEventHandler(Pointer inTarget, Pointer inHandler, ItemCount inNumTypes, EventTypeSpec[] inList, Pointer inUserData, PointerByReference outRef);
 
     public OSStatus RegisterEventHotKey(int inHotKeyCode, int inHotKeyModifiers, EventHotKeyID.ByValue inHotKeyID, Pointer inTarget, int inOptions, PointerByReference outRef);
@@ -33,16 +36,9 @@ public interface CarbonLib extends Library {
 
     public int GetEventParameter(Pointer inEvent, int inName, int inDesiredType, Pointer outActualType, int inBufferSize, IntBuffer outActualSize, EventHotKeyID outData);
 
-    public Pointer GetEventMonitorTarget();
-
     public OSStatus RemoveEventHandler(Pointer inHandlerRef);
 
-    /*extern OSStatus AddEventTypesToHandler(
-      EventHandlerRef        inHandlerRef,
-      ItemCount              inNumTypes,
-      const EventTypeSpec *  inList)*/
-    public OSStatus AddEventTypesToHandler(Pointer inHandlerRef, ItemCount inNumTypes, EventTypeSpec inList);
-
+    public int UnregisterEventHotKey(Pointer inHotKey);
 
     /* typedef SInt32 OSStatus */
     public class OSStatus extends IntegerType {
@@ -82,15 +78,8 @@ public interface CarbonLib extends Library {
         }
     }
 
-
-    public static interface EventHandlerUPP {
-
-    }
-
     /* typedef OSStatus (*EventHandlerProcPtr) ( EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void * inUserData ); */
     public static interface EventHandlerProcPtr extends Callback {
         public OSStatus callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData);
-        //OSStatus callback(EventHandlerCallRef inHandlerCallRef, EventRef inEvent, Pointer inUserData); }
-
     }
 }
