@@ -52,6 +52,7 @@ public class X11Provider implements Provider {
                                         state == KeyMap.getModifiers(keyStroke)) {
                                     logger.info("Received event for KeyCode: " + keyStroke.toString());
                                     entry.getValue().actionPerformed(new ActionEvent(keyStroke, 0, ""));
+                                    break;
                                 }
                             }
                         }
