@@ -48,7 +48,7 @@ public class X11Provider implements Provider {
                             for (Map.Entry<KeyStroke, ActionListener> entry : listeners.entrySet()) {
                                 KeyStroke keyStroke = entry.getKey();
                                 int state = xkey.state & (ShiftMask|ControlMask|Mod1Mask|Mod4Mask);
-                                if (KeyMap.getCode(keyStroke, display) == xkey.keycode &&
+                                if (KeyMap.getCode(keyStroke, display) == (byte) xkey.keycode &&
                                         state == KeyMap.getModifiers(keyStroke)) {
                                     logger.info("Received event for KeyCode: " + keyStroke.toString());
                                     entry.getValue().actionPerformed(new ActionEvent(keyStroke, 0, ""));
@@ -125,7 +125,7 @@ public class X11Provider implements Provider {
                 code = XF86XK_AudioStop;
                 break;
         }
-        XGrabKey(display, code, 0, window, true, GrabModeAsync, GrabModeAsync);
+        XGrabKey(display, XKeysymToKeycode(display, code), 0, window, true, GrabModeAsync, GrabModeAsync);
         listeners.put(KeyStroke.getKeyStroke(code, 0), listener);
     }
 
