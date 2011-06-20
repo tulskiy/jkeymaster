@@ -31,9 +31,9 @@ public class HotKey {
         final StringBuilder sb = new StringBuilder();
         sb.append("HotKey");
         if (keyStroke != null)
-            sb.append("{keyStroke=").append(keyStroke);
+            sb.append("{").append(keyStroke.toString().replaceAll("pressed ", ""));
         if (mediaKey != null)
-            sb.append("{mediaKey=").append(mediaKey);
+            sb.append("{").append(mediaKey);
         sb.append('}');
         return sb.toString();
     }

@@ -6,29 +6,15 @@ import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
 import java.util.*;
 
 import static com.tulskiy.keymaster.windows.User32.*;
-import static java.awt.event.KeyEvent.*;
 
 /**
  * Author: Denis Tulskiy
  * Date: 6/12/11
  */
 public class WindowsProvider extends Provider {
-    private static final Map<Integer, Integer> codeExceptions = new HashMap<Integer, Integer>() {{
-        put(VK_INSERT, 0x2D);
-        put(VK_DELETE, 0x2E);
-        put(VK_ENTER, 0x0D);
-        put(VK_COMMA, 0xBC);
-        put(VK_PERIOD, 0xBE);
-        put(VK_PLUS, 0xBB);
-        put(VK_MINUS, 0xBD);
-        put(VK_SLASH, 0xBF);
-        put(VK_SEMICOLON, 0xBA);
-    }};
-
     private static volatile int idSeq = 0;
 
     private boolean listen;
@@ -37,7 +23,7 @@ public class WindowsProvider extends Provider {
     private Thread thread;
 
     private Map<Integer, HotKey> hotKeys = new HashMap<Integer, HotKey>();
-    private List<HotKey> registerQueue = new ArrayList<HotKey>();
+    private Deque<HotKey> registerQueue = new LinkedList<HotKey>();
 
     public void init() {
         Runnable runnable = new Runnable() {
@@ -56,11 +42,8 @@ public class WindowsProvider extends Provider {
                             lock.notify();
                         }
 
-                        if (!registerQueue.isEmpty()) {
-                            for (HotKey entry : registerQueue) {
-                                register(entry);
-                            }
-                            registerQueue.clear();
+                        while (!registerQueue.isEmpty()) {
+                            register(registerQueue.poll());
                         }
                     }
 
@@ -87,18 +70,14 @@ public class WindowsProvider extends Provider {
         thread.start();
     }
 
-    private void register(HotKey entry) {
+    private void register(HotKey hotKey) {
         int id = idSeq++;
-        KeyStroke keyCode = entry.keyStroke;
-        int code = keyCode.getKeyCode();
-        if (codeExceptions.containsKey(code)) {
-            code = codeExceptions.get(code);
-        }
-        if (RegisterHotKey(null, id, getModifiers(keyCode), code)) {
-            logger.info("Registering hotkey: " + keyCode);
-            hotKeys.put(id, entry);
+        int code = KeyMap.getCode(hotKey);
+        if (RegisterHotKey(null, id, KeyMap.getModifiers(hotKey.keyStroke), code)) {
+            logger.info("Registering hotkey: " + hotKey);
+            hotKeys.put(id, hotKey);
         } else {
-            logger.warning("Could not register hotkey: " + keyCode);
+            logger.warning("Could not register hotkey: " + hotKey);
         }
     }
 
@@ -109,23 +88,9 @@ public class WindowsProvider extends Provider {
     }
 
     public void register(MediaKey mediaKey, ActionListener listener) {
-        int code = 0;
-        switch (mediaKey) {
-            case MEDIA_NEXT_TRACK:
-                code = VK_MEDIA_NEXT_TRACK;
-                break;
-            case MEDIA_PLAY_PAUSE:
-                code = VK_MEDIA_PLAY_PAUSE;
-                break;
-            case MEDIA_PREV_TRACK:
-                code = VK_MEDIA_PREV_TRACK;
-                break;
-            case MEDIA_STOP:
-                code = VK_MEDIA_STOP;
-                break;
+        synchronized (lock) {
+            registerQueue.add(new HotKey(mediaKey, listener));
         }
-
-        register(KeyStroke.getKeyStroke(code, 0), listener);
     }
 
     public void reset() {
@@ -148,22 +113,5 @@ public class WindowsProvider extends Provider {
                 e.printStackTrace();
             }
         }
-    }
-
-    public int getModifiers(KeyStroke keyCode) {
-        int modifiers = 0;
-        if ((keyCode.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0) {
-            modifiers |= MOD_SHIFT;
-        }
-        if ((keyCode.getModifiers() & InputEvent.CTRL_DOWN_MASK) != 0) {
-            modifiers |= MOD_CONTROL;
-        }
-        if ((keyCode.getModifiers() & InputEvent.META_DOWN_MASK) != 0) {
-            modifiers |= MOD_WIN;
-        }
-        if ((keyCode.getModifiers() & InputEvent.ALT_DOWN_MASK) != 0) {
-            modifiers |= MOD_ALT;
-        }
-        return modifiers;
     }
 }
