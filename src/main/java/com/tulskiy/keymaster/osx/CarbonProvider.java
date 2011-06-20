@@ -18,7 +18,7 @@ import static com.tulskiy.keymaster.osx.CarbonLib.*;
  * Author: Denis Tulskiy
  * Date: 6/17/11
  */
-public class CarbonProvider implements Provider {
+public class CarbonProvider extends Provider {
     private static final int kEventHotKeyPressed = 5;
 
     private static final int kEventClassKeyboard = OS_TYPE("keyb");
@@ -120,7 +120,7 @@ public class CarbonProvider implements Provider {
 
                 ActionListener listener = idToListener.get(eventId);
                 if (listener != null) {
-                    listener.actionPerformed(new ActionEvent(idToKeyStroke.get(eventId), 0, ""));
+                    fireEvent(idToKeyStroke.get(eventId), listener);
                 }
             }
             return noErr;

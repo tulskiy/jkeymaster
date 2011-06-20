@@ -17,7 +17,7 @@ import static com.tulskiy.keymaster.x11.KeySymDef.*;
  * Author: Denis Tulskiy
  * Date: 6/13/11
  */
-public class X11Provider implements Provider {
+public class X11Provider extends Provider {
     private Map<KeyStroke, ActionListener> listeners = Collections.synchronizedMap(new HashMap<KeyStroke, ActionListener>());
     private Display display;
     private Window window;
@@ -51,7 +51,7 @@ public class X11Provider implements Provider {
                                 if (KeyMap.getCode(keyStroke, display) == (byte) xkey.keycode &&
                                         state == KeyMap.getModifiers(keyStroke)) {
                                     logger.info("Received event for KeyCode: " + keyStroke.toString());
-                                    entry.getValue().actionPerformed(new ActionEvent(keyStroke, 0, ""));
+                                    fireEvent(keyStroke, entry.getValue());
                                     break;
                                 }
                             }

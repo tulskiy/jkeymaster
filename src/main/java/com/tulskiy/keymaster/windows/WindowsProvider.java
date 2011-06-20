@@ -18,7 +18,7 @@ import static java.awt.event.KeyEvent.*;
  * Author: Denis Tulskiy
  * Date: 6/12/11
  */
-public class WindowsProvider implements Provider {
+public class WindowsProvider extends Provider {
     private static final Map<Integer, Integer> codeExceptions = new HashMap<Integer, Integer>() {{
         put(VK_INSERT, 0x2D);
         put(VK_DELETE, 0x2E);
@@ -84,7 +84,7 @@ public class WindowsProvider implements Provider {
                             ActionListener listener = idToListener.get(id);
 
                             if (listener != null) {
-                                listener.actionPerformed(new ActionEvent(idToKeyStroke.get(id), 0, ""));
+                                fireEvent(idToKeyStroke.get(id), listener);
                             }
                         }
                     }
