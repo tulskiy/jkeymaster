@@ -68,7 +68,7 @@ public class CarbonProvider extends Provider {
                     eventTypes[0].eventClass = kEventClassKeyboard;
                     eventTypes[0].eventKind = kEventHotKeyPressed;
 
-                    int status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), Lib.NewEventHandlerUPP(keyListener), 1, eventTypes, null, eventHandlerReference); //fHandlerRef
+                    int status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), keyListener, 1, eventTypes, null, eventHandlerReference); //fHandlerRef
                     if (status != 0) {
                         logger.warning("Could not register Event Handler, error code: " + status);
                     }
