@@ -6,7 +6,6 @@ import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,8 +43,8 @@ public class CarbonProvider extends Provider {
         eventTypes[0].eventClass = kEventClassKeyboard;
         eventTypes[0].eventKind = kEventHotKeyPressed;
 
-        CarbonLib.OSStatus status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), Lib.NewEventHandlerUPP(keyListener), new CarbonLib.ItemCount(1), eventTypes, null, eventHandlerReference); //fHandlerRef
-        if (status.intValue() != 0) {
+        int status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), Lib.NewEventHandlerUPP(keyListener), 1, eventTypes, null, eventHandlerReference); //fHandlerRef
+        if (status != 0) {
             logger.warning("Could not register Event Handler, error code: " + status);
         }
 
@@ -81,9 +80,9 @@ public class CarbonProvider extends Provider {
         hotKeyReference.signature = OS_TYPE("hk" + String.format("%02d", id));
         PointerByReference gMyHotKeyRef = new PointerByReference();
 
-        OSStatus status = Lib.RegisterEventHotKey(KeyMap.getKeyCode(keyCode), KeyMap.getModifier(keyCode), hotKeyReference, Lib.GetEventDispatcherTarget(), 0, gMyHotKeyRef);
+        int status = Lib.RegisterEventHotKey(KeyMap.getKeyCode(keyCode), KeyMap.getModifier(keyCode), hotKeyReference, Lib.GetEventDispatcherTarget(), 0, gMyHotKeyRef);
 
-        if (status.intValue() != 0) {
+        if (status != 0) {
             logger.warning("Could not register HotKey: " + keyCode + ". Error code: " + status);
             return;
         }
@@ -109,7 +108,7 @@ public class CarbonProvider extends Provider {
     }
 
     private class EventHandler implements CarbonLib.EventHandlerProcPtr {
-        public OSStatus callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData) {
+        public int callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData) {
             EventHotKeyID eventHotKeyID = new EventHotKeyID();
             int ret = Lib.GetEventParameter(inEvent, kEventParamDirectObject, typeEventHotKeyID, null, eventHotKeyID.size(), null, eventHotKeyID);
             if (ret != 0) {
@@ -123,7 +122,7 @@ public class CarbonProvider extends Provider {
                     fireEvent(idToKeyStroke.get(eventId), listener);
                 }
             }
-            return noErr;
+            return 0;
         }
     }
 }
