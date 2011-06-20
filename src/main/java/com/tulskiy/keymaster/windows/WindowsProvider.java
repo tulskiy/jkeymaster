@@ -1,5 +1,6 @@
 package com.tulskiy.keymaster.windows;
 
+import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
@@ -66,10 +67,10 @@ public class WindowsProvider extends Provider {
                     while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
                         if (msg.message == WM_HOTKEY) {
                             int id = msg.wParam.intValue();
-                            HotKey key = hotKeys.get(id);
+                            HotKey hotKey = hotKeys.get(id);
 
-                            if (key != null) {
-                                fireEvent(key.keyStroke, key.listener);
+                            if (hotKey != null) {
+                                fireEvent(hotKey);
                             }
                         }
                     }

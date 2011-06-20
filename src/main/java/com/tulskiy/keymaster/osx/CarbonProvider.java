@@ -119,7 +119,7 @@ public class CarbonProvider extends Provider {
 
                 ActionListener listener = idToListener.get(eventId);
                 if (listener != null) {
-                    fireEvent(idToKeyStroke.get(eventId), listener);
+//                    fireEvent(idToKeyStroke.get(eventId), listener);
                 }
             }
             return 0;

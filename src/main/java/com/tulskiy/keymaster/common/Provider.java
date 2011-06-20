@@ -26,31 +26,20 @@ public abstract class Provider {
 
     public abstract void register(MediaKey mediaKey, ActionListener listener);
 
-    protected void fireEvent(Object source, ActionListener listener) {
-        eventQueue.execute(new HotKeyEvent(source, listener));
+    protected void fireEvent(HotKey hotKey) {
+        eventQueue.execute(new HotKeyEvent(hotKey));
     }
 
     private class HotKeyEvent implements Runnable {
-        private Object source;
-        private ActionListener listener;
+        private HotKey hotKey;
 
-        private HotKeyEvent(Object source, ActionListener listener) {
-            this.source = source;
-            this.listener = listener;
+        private HotKeyEvent(HotKey hotKey) {
+            this.hotKey = hotKey;
         }
 
         public void run() {
-            listener.actionPerformed(new ActionEvent(source, 0, ""));
+            hotKey.listener.actionPerformed(new ActionEvent(hotKey, 0, ""));
         }
     }
 
-    protected class HotKey {
-        public KeyStroke keyStroke;
-        public ActionListener listener;
-
-        public HotKey(KeyStroke keyStroke, ActionListener listener) {
-            this.keyStroke = keyStroke;
-            this.listener = listener;
-        }
-    }
 }
