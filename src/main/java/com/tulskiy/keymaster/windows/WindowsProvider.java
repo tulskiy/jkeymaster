@@ -4,12 +4,9 @@ import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.tulskiy.keymaster.windows.User32.*;
 import static java.awt.event.KeyEvent.*;
@@ -33,13 +30,13 @@ public class WindowsProvider extends Provider {
 
     private static volatile int idSeq = 0;
 
-    private Map<Integer, ActionListener> idToListener = Collections.synchronizedMap(new HashMap<Integer, ActionListener>());
-    private Map<Integer, KeyStroke> idToKeyStroke = Collections.synchronizedMap(new HashMap<Integer, KeyStroke>());
-    private final Map<KeyStroke, ActionListener> toRegister = new HashMap<KeyStroke, ActionListener>();
     private boolean listen;
     private Boolean reset = false;
     private final Object lock = new Object();
     private Thread thread;
+
+    private Map<Integer, HotKey> hotKeys = new HashMap<Integer, HotKey>();
+    private List<HotKey> registerQueue = new ArrayList<HotKey>();
 
     public void init() {
         Runnable runnable = new Runnable() {
@@ -49,47 +46,35 @@ public class WindowsProvider extends Provider {
                 while (listen) {
                     synchronized (lock) {
                         if (reset) {
-                            for (Integer id : idToListener.keySet()) {
+                            for (Integer id : hotKeys.keySet()) {
                                 UnregisterHotKey(null, id);
                             }
 
-                            idToListener.clear();
-                            idToKeyStroke.clear();
+                            hotKeys.clear();
                             reset = false;
                             lock.notify();
                         }
 
-                        for (Map.Entry<KeyStroke, ActionListener> entry : toRegister.entrySet()) {
-                            int id = idSeq++;
-                            KeyStroke keyCode = entry.getKey();
-                            ActionListener listener = entry.getValue();
-                            int code = keyCode.getKeyCode();
-                            if (codeExceptions.containsKey(code)) {
-                                code = codeExceptions.get(code);
+                        if (!registerQueue.isEmpty()) {
+                            for (HotKey entry : registerQueue) {
+                                register(entry);
                             }
-                            if (RegisterHotKey(null, id, getModifiers(keyCode), code)) {
-                                logger.info("Registering hotkey: " + keyCode);
-                                idToListener.put(id, listener);
-                                idToKeyStroke.put(id, keyCode);
-                            } else {
-                                logger.warning("Could not register hotkey: " + keyCode);
-                            }
+                            registerQueue.clear();
                         }
-                        toRegister.clear();
                     }
 
                     while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
                         if (msg.message == WM_HOTKEY) {
                             int id = msg.wParam.intValue();
-                            ActionListener listener = idToListener.get(id);
+                            HotKey key = hotKeys.get(id);
 
-                            if (listener != null) {
-                                fireEvent(idToKeyStroke.get(id), listener);
+                            if (key != null) {
+                                fireEvent(key.keyStroke, key.listener);
                             }
                         }
                     }
                     try {
-                        Thread.sleep(300);
+                        lock.wait(300);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -101,9 +86,24 @@ public class WindowsProvider extends Provider {
         thread.start();
     }
 
+    private void register(HotKey entry) {
+        int id = idSeq++;
+        KeyStroke keyCode = entry.keyStroke;
+        int code = keyCode.getKeyCode();
+        if (codeExceptions.containsKey(code)) {
+            code = codeExceptions.get(code);
+        }
+        if (RegisterHotKey(null, id, getModifiers(keyCode), code)) {
+            logger.info("Registering hotkey: " + keyCode);
+            hotKeys.put(id, entry);
+        } else {
+            logger.warning("Could not register hotkey: " + keyCode);
+        }
+    }
+
     public void register(KeyStroke keyCode, ActionListener listener) {
         synchronized (lock) {
-            toRegister.put(keyCode, listener);
+            registerQueue.add(new HotKey(keyCode, listener));
         }
     }
 

@@ -44,4 +44,13 @@ public abstract class Provider {
         }
     }
 
+    protected class HotKey {
+        public KeyStroke keyStroke;
+        public ActionListener listener;
+
+        public HotKey(KeyStroke keyStroke, ActionListener listener) {
+            this.keyStroke = keyStroke;
+            this.listener = listener;
+        }
+    }
 }
