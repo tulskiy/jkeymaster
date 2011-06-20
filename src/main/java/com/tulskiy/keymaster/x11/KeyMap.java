@@ -1,5 +1,7 @@
 package com.tulskiy.keymaster.x11;
 
+import com.tulskiy.keymaster.common.MediaKey;
+
 import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.util.HashMap;
@@ -95,6 +97,25 @@ public class KeyMap {
         } else {
             return 0;
         }
+    }
+
+    public static byte getMediaCode(MediaKey mediaKey, Display display) {
+        int code = 0;
+        switch (mediaKey) {
+            case MEDIA_NEXT_TRACK:
+                code = XF86XK_AudioNext;
+                break;
+            case MEDIA_PLAY_PAUSE:
+                code = XF86XK_AudioPlay;
+                break;
+            case MEDIA_PREV_TRACK:
+                code = XF86XK_AudioPrev;
+                break;
+            case MEDIA_STOP:
+                code = XF86XK_AudioStop;
+                break;
+        }
+        return XKeysymToKeycode(display, code);
     }
 
     public static int getModifiers(KeyStroke keyCode) {

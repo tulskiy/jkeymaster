@@ -104,6 +104,13 @@ public class X11Provider extends Provider {
         }
     }
 
+    private void registerMedia(X11HotKey hotKey) {
+        byte keyCode = KeyMap.getMediaCode(hotKey.mediaKey, display);
+        hotKey.modifiers = 0;
+        hotKey.code = keyCode;
+        XGrabKey(display, keyCode, 0, window, true, GrabModeAsync, GrabModeAsync);
+    }
+
     private void resetAll() {
         for (X11HotKey hotKey : hotKeys) {
             if (!hotKey.isMedia()) {
@@ -132,28 +139,6 @@ public class X11Provider extends Provider {
         if ((flags & 8) != 0)
             ret |= Mod5Mask;
         return ret;
-    }
-
-    private void registerMedia(X11HotKey hotKey) {
-        int code = 0;
-        switch (hotKey.mediaKey) {
-            case MEDIA_NEXT_TRACK:
-                code = XF86XK_AudioNext;
-                break;
-            case MEDIA_PLAY_PAUSE:
-                code = XF86XK_AudioPlay;
-                break;
-            case MEDIA_PREV_TRACK:
-                code = XF86XK_AudioPrev;
-                break;
-            case MEDIA_STOP:
-                code = XF86XK_AudioStop;
-                break;
-        }
-        hotKey.modifiers = 0;
-        byte keyCode = XKeysymToKeycode(display, code);
-        hotKey.code = keyCode;
-        XGrabKey(display, keyCode, 0, window, true, GrabModeAsync, GrabModeAsync);
     }
 
     public void stop() {
