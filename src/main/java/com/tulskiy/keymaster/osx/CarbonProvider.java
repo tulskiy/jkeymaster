@@ -2,13 +2,13 @@ package com.tulskiy.keymaster.osx;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
+import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static com.tulskiy.keymaster.osx.CarbonLib.Lib;
 import static com.tulskiy.keymaster.osx.CarbonLib.*;
@@ -21,59 +21,77 @@ public class CarbonProvider extends Provider {
     private static final int kEventHotKeyPressed = 5;
 
     private static final int kEventClassKeyboard = OS_TYPE("keyb");
-    private static final int typeEventHotKeyID = OS_TYPE("hkid"); /* EventHotKeyID*/
+    private static final int typeEventHotKeyID = OS_TYPE("hkid");
     private static final int kEventParamDirectObject = OS_TYPE("----");
 
     private static int idSeq = 1;
 
-    private Map<Integer, KeyStroke> idToKeyStroke = new HashMap<Integer, KeyStroke>();
-    private Map<Integer, PointerByReference> idToHandler = new HashMap<Integer, PointerByReference>();
-    private Map<Integer, ActionListener> idToListener = new HashMap<Integer, ActionListener>();
+    private Map<Integer, OSXHotKey> hotKeys = new HashMap<Integer, OSXHotKey>();
+    private Queue<OSXHotKey> registerQueue = new LinkedList<OSXHotKey>();
+    private final Object lock = new Object();
+    private boolean listen;
+    private boolean reset;
 
-    public EventHandlerProcPtr keyListener;
-    public PointerByReference eventHandlerReference;
+    private EventHandlerProcPtr keyListener;
+    private PointerByReference eventHandlerReference;
+    public Thread thread;
 
 
     public void init() {
-        logger.info("Installing Event Handler");
-        eventHandlerReference = new PointerByReference();
-        keyListener = new EventHandler();
+        thread = new Thread(new Runnable() {
+            public void run() {
+                synchronized (lock) {
+                    logger.info("Installing Event Handler");
+                    eventHandlerReference = new PointerByReference();
+                    keyListener = new EventHandler();
 
-        CarbonLib.EventTypeSpec[] eventTypes = (CarbonLib.EventTypeSpec[]) (new CarbonLib.EventTypeSpec().toArray(1));
-        eventTypes[0].eventClass = kEventClassKeyboard;
-        eventTypes[0].eventKind = kEventHotKeyPressed;
+                    EventTypeSpec[] eventTypes = (EventTypeSpec[]) (new EventTypeSpec().toArray(1));
+                    eventTypes[0].eventClass = kEventClassKeyboard;
+                    eventTypes[0].eventKind = kEventHotKeyPressed;
 
-        int status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), Lib.NewEventHandlerUPP(keyListener), 1, eventTypes, null, eventHandlerReference); //fHandlerRef
-        if (status != 0) {
-            logger.warning("Could not register Event Handler, error code: " + status);
-        }
+                    int status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), Lib.NewEventHandlerUPP(keyListener), 1, eventTypes, null, eventHandlerReference); //fHandlerRef
+                    if (status != 0) {
+                        logger.warning("Could not register Event Handler, error code: " + status);
+                    }
 
-        if (eventHandlerReference.getValue() == null) {
-            logger.warning("Event Handler reference is null");
-        }
+                    if (eventHandlerReference.getValue() == null) {
+                        logger.warning("Event Handler reference is null");
+                    }
+                    while (listen) {
+                        if (reset) {
+                            resetAll();
+                            lock.notify();
+                        }
+
+                        while (!registerQueue.isEmpty()) {
+                            register(registerQueue.poll());
+                        }
+
+                        try {
+                            lock.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        });
+
+        thread.start();
     }
 
-    public void stop() {
-        if (eventHandlerReference.getValue() != null) {
-            Lib.RemoveEventHandler(eventHandlerReference.getValue());
-        }
-    }
-
-    public void reset() {
+    private void resetAll() {
         logger.info("Resetting hotkeys");
-        for (PointerByReference ptr : idToHandler.values()) {
-            int ret = Lib.UnregisterEventHotKey(ptr.getValue());
+        for (OSXHotKey hotKey : hotKeys.values()) {
+            int ret = Lib.UnregisterEventHotKey(hotKey.handler.getValue());
             if (ret != 0) {
                 logger.warning("Could not unregister hotkey. Error code: " + ret);
             }
         }
-
-        idToHandler.clear();
-        idToKeyStroke.clear();
-        idToListener.clear();
     }
 
-    public void register(KeyStroke keyCode, ActionListener listener) {
+    private void register(OSXHotKey hotKey) {
+        KeyStroke keyCode = hotKey.keyStroke;
         EventHotKeyID.ByValue hotKeyReference = new EventHotKeyID.ByValue();
         int id = idSeq++;
         hotKeyReference.id = id;
@@ -93,9 +111,41 @@ public class CarbonProvider extends Provider {
         }
 
         logger.info("Registered hotkey: " + keyCode);
-        idToHandler.put(id, gMyHotKeyRef);
-        idToKeyStroke.put(id, keyCode);
-        idToListener.put(id, listener);
+        hotKeys.put(id, hotKey);
+    }
+
+    public void stop() {
+        synchronized (lock) {
+            listen = false;
+            try {
+                lock.notify();
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        if (eventHandlerReference.getValue() != null) {
+            Lib.RemoveEventHandler(eventHandlerReference.getValue());
+        }
+    }
+
+    public void reset() {
+        synchronized (lock) {
+            reset = true;
+            lock.notify();
+            try {
+                lock.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void register(KeyStroke keyCode, ActionListener listener) {
+        synchronized (lock) {
+            registerQueue.add(new OSXHotKey(keyCode, listener));
+            lock.notify();
+        }
     }
 
     public void register(MediaKey mediaKey, ActionListener listener) {
@@ -116,13 +166,18 @@ public class CarbonProvider extends Provider {
             } else {
                 int eventId = eventHotKeyID.id;
                 logger.info("Received event id: " + eventId);
-
-                ActionListener listener = idToListener.get(eventId);
-                if (listener != null) {
-//                    fireEvent(idToKeyStroke.get(eventId), listener);
-                }
+                fireEvent(hotKeys.get(eventId));
             }
             return 0;
         }
     }
+
+    class OSXHotKey extends HotKey {
+        PointerByReference handler;
+
+        public OSXHotKey(KeyStroke keyStroke, ActionListener listener) {
+            super(keyStroke, listener);
+        }
+    }
+
 }
