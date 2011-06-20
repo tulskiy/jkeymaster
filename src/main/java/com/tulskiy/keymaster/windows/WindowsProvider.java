@@ -31,6 +31,17 @@ public class WindowsProvider extends Provider {
                 MSG msg = new MSG();
                 listen = true;
                 while (listen) {
+                    while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
+                        if (msg.message == WM_HOTKEY) {
+                            int id = msg.wParam.intValue();
+                            HotKey hotKey = hotKeys.get(id);
+
+                            if (hotKey != null) {
+                                fireEvent(hotKey);
+                            }
+                        }
+                    }
+
                     synchronized (lock) {
                         if (reset) {
                             for (Integer id : hotKeys.keySet()) {
@@ -45,22 +56,11 @@ public class WindowsProvider extends Provider {
                         while (!registerQueue.isEmpty()) {
                             register(registerQueue.poll());
                         }
-                    }
-
-                    while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
-                        if (msg.message == WM_HOTKEY) {
-                            int id = msg.wParam.intValue();
-                            HotKey hotKey = hotKeys.get(id);
-
-                            if (hotKey != null) {
-                                fireEvent(hotKey);
-                            }
+                        try {
+                            lock.wait(300);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
-                    }
-                    try {
-                        lock.wait(300);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
                     }
                 }
             }
