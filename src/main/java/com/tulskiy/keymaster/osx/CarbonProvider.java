@@ -57,9 +57,11 @@ public class CarbonProvider extends Provider {
                     if (eventHandlerReference.getValue() == null) {
                         logger.warning("Event Handler reference is null");
                     }
+                    listen = true;
                     while (listen) {
                         if (reset) {
                             resetAll();
+                            reset = false;
                             lock.notify();
                         }
 
@@ -88,6 +90,7 @@ public class CarbonProvider extends Provider {
                 logger.warning("Could not unregister hotkey. Error code: " + ret);
             }
         }
+        hotKeys.clear();
     }
 
     private void register(OSXHotKey hotKey) {
@@ -109,20 +112,21 @@ public class CarbonProvider extends Provider {
             logger.warning("HotKey returned null handler reference");
             return;
         }
-
+        hotKey.handler = gMyHotKeyRef;
         logger.info("Registered hotkey: " + keyCode);
         hotKeys.put(id, hotKey);
     }
 
     public void stop() {
-        synchronized (lock) {
-            listen = false;
-            try {
+        logger.info("Stopping now");
+        try {
+            synchronized (lock) {
+                listen = false;
                 lock.notify();
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
             }
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         if (eventHandlerReference.getValue() != null) {
             Lib.RemoveEventHandler(eventHandlerReference.getValue());
