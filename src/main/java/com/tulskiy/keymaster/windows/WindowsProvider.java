@@ -28,6 +28,7 @@ public class WindowsProvider extends Provider {
     public void init() {
         Runnable runnable = new Runnable() {
             public void run() {
+                logger.info("Starting Windows global hotkey provider");
                 MSG msg = new MSG();
                 listen = true;
                 while (listen) {
@@ -44,6 +45,7 @@ public class WindowsProvider extends Provider {
 
                     synchronized (lock) {
                         if (reset) {
+                            logger.info("Reset hotkeys");
                             for (Integer id : hotKeys.keySet()) {
                                 UnregisterHotKey(null, id);
                             }
@@ -63,6 +65,7 @@ public class WindowsProvider extends Provider {
                         }
                     }
                 }
+                logger.info("Exit listening thread");
             }
         };
 
