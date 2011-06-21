@@ -20,6 +20,8 @@ package com.tulskiy.keymaster.common;
 import javax.swing.*;
 
 /**
+ * Internal representation of a hotkey. Either keyStroke or mediaKey should be set.
+ * <p/>
  * Author: Denis Tulskiy
  * Date: 6/20/11
  */

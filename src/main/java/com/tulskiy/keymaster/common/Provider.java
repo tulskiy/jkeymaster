@@ -28,12 +28,22 @@ import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 /**
+ * Main interface to global hotkey providers
+ * <p/>
  * Author: Denis Tulskiy
  * Date: 6/12/11
  */
 public abstract class Provider {
     public static final Logger logger = Logger.getLogger(Provider.class.getName());
 
+    /**
+     * Get global hotkey provider for current platform
+     *
+     * @return new instance of Provider, or null if platform is not supported
+     * @see X11Provider
+     * @see WindowsProvider
+     * @see CarbonProvider
+     */
     public static Provider getCurrentProvider() {
         if (Platform.isX11()) {
             return new X11Provider();
@@ -49,16 +59,55 @@ public abstract class Provider {
 
     private ExecutorService eventQueue = Executors.newSingleThreadExecutor();
 
+    /**
+     * Initialize provider. Starts main thread that will listen to hotkey events
+     */
     public abstract void init();
 
+    /**
+     * Stop the provider. Stops main thread and frees any resources.
+     * </br>
+     * all hotkeys should be reset before calling this method
+     *
+     * @see Provider#reset()
+     */
     public abstract void stop();
 
+    /**
+     * Reset all hotkey listeners
+     */
     public abstract void reset();
 
+    /**
+     * Register a global hotkey. Only keyCode and modifiers fields are respected
+     *
+     * @param keyCode  KeyStroke to register
+     * @param listener listener to be notified of hotkey events
+     * @see KeyStroke
+     */
     public abstract void register(KeyStroke keyCode, HotKeyListener listener);
 
+    /**
+     * Register a media hotkey. Currently supported media keys are:
+     * <p/>
+     * <ul>
+     * <li>Play/Pause</li>
+     * <li>Stop</li>
+     * <li>Next track</li>
+     * <li>Previous Track</li>
+     * </ul>
+     *
+     * @param mediaKey
+     * @param listener listener to be notified of hotkey events
+     * @see MediaKey
+     */
     public abstract void register(MediaKey mediaKey, HotKeyListener listener);
 
+    /**
+     * Helper method fro providers to fire hotkey event in a separate thread
+     *
+     * @param hotKey hotkey to fire
+     */
     protected void fireEvent(HotKey hotKey) {
         eventQueue.execute(new HotKeyEvent(hotKey));
     }
