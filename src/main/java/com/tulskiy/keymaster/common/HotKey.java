@@ -18,23 +18,22 @@
 package com.tulskiy.keymaster.common;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 
 /**
-* Author: Denis Tulskiy
-* Date: 6/20/11
-*/
+ * Author: Denis Tulskiy
+ * Date: 6/20/11
+ */
 public class HotKey {
     public KeyStroke keyStroke;
     public MediaKey mediaKey;
-    public ActionListener listener;
+    public HotKeyListener listener;
 
-    public HotKey(KeyStroke keyStroke, ActionListener listener) {
+    public HotKey(KeyStroke keyStroke, HotKeyListener listener) {
         this.keyStroke = keyStroke;
         this.listener = listener;
     }
 
-    public HotKey(MediaKey mediaKey, ActionListener listener) {
+    public HotKey(MediaKey mediaKey, HotKeyListener listener) {
         this.mediaKey = mediaKey;
         this.listener = listener;
     }

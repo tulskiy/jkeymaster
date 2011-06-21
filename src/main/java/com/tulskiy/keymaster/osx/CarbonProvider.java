@@ -20,14 +20,16 @@ package com.tulskiy.keymaster.osx;
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
 import com.tulskiy.keymaster.common.HotKey;
+import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
-import static com.tulskiy.keymaster.osx.CarbonLib.Lib;
 import static com.tulskiy.keymaster.osx.CarbonLib.*;
 
 /**
@@ -162,14 +164,14 @@ public class CarbonProvider extends Provider {
         }
     }
 
-    public void register(KeyStroke keyCode, ActionListener listener) {
+    public void register(KeyStroke keyCode, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new OSXHotKey(keyCode, listener));
             lock.notify();
         }
     }
 
-    public void register(MediaKey mediaKey, ActionListener listener) {
+    public void register(MediaKey mediaKey, HotKeyListener listener) {
         logger.warning("Media keys are not supported on this platform");
     }
 
@@ -196,7 +198,7 @@ public class CarbonProvider extends Provider {
     class OSXHotKey extends HotKey {
         PointerByReference handler;
 
-        public OSXHotKey(KeyStroke keyStroke, ActionListener listener) {
+        public OSXHotKey(KeyStroke keyStroke, HotKeyListener listener) {
             super(keyStroke, listener);
         }
     }

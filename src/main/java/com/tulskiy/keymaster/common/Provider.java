@@ -23,8 +23,6 @@ import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
@@ -57,9 +55,9 @@ public abstract class Provider {
 
     public abstract void reset();
 
-    public abstract void register(KeyStroke keyCode, ActionListener listener);
+    public abstract void register(KeyStroke keyCode, HotKeyListener listener);
 
-    public abstract void register(MediaKey mediaKey, ActionListener listener);
+    public abstract void register(MediaKey mediaKey, HotKeyListener listener);
 
     protected void fireEvent(HotKey hotKey) {
         eventQueue.execute(new HotKeyEvent(hotKey));
@@ -73,7 +71,7 @@ public abstract class Provider {
         }
 
         public void run() {
-            hotKey.listener.actionPerformed(new ActionEvent(hotKey, 0, ""));
+            hotKey.listener.onHotKey(hotKey);
         }
     }
 

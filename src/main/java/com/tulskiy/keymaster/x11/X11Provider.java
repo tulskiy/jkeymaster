@@ -18,11 +18,11 @@
 package com.tulskiy.keymaster.x11;
 
 import com.tulskiy.keymaster.common.HotKey;
+import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -172,13 +172,13 @@ public class X11Provider extends Provider {
         }
     }
 
-    public void register(KeyStroke keyCode, ActionListener listener) {
+    public void register(KeyStroke keyCode, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new X11HotKey(keyCode, listener));
         }
     }
 
-    public void register(MediaKey mediaKey, ActionListener listener) {
+    public void register(MediaKey mediaKey, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new X11HotKey(mediaKey, listener));
         }
@@ -210,11 +210,11 @@ public class X11Provider extends Provider {
         byte code;
         int modifiers;
 
-        X11HotKey(KeyStroke keyStroke, ActionListener listener) {
+        X11HotKey(KeyStroke keyStroke, HotKeyListener listener) {
             super(keyStroke, listener);
         }
 
-        X11HotKey(MediaKey mediaKey, ActionListener listener) {
+        X11HotKey(MediaKey mediaKey, HotKeyListener listener) {
             super(mediaKey, listener);
         }
     }

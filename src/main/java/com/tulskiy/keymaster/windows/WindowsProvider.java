@@ -18,11 +18,11 @@
 package com.tulskiy.keymaster.windows;
 
 import com.tulskiy.keymaster.common.HotKey;
+import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
-import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -104,13 +104,13 @@ public class WindowsProvider extends Provider {
         }
     }
 
-    public void register(KeyStroke keyCode, ActionListener listener) {
+    public void register(KeyStroke keyCode, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new HotKey(keyCode, listener));
         }
     }
 
-    public void register(MediaKey mediaKey, ActionListener listener) {
+    public void register(MediaKey mediaKey, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new HotKey(mediaKey, listener));
         }

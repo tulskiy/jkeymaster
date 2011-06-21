@@ -17,6 +17,8 @@
 
 package com.tulskiy.keymaster;
 
+import com.tulskiy.keymaster.common.HotKey;
+import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
@@ -53,20 +55,21 @@ public class AWTTest {
         JPanel box = new JPanel(new GridLayout(2, 1));
         JButton grab = new JButton("Grab");
         box.add(grab);
+        final HotKeyListener listener = new HotKeyListener() {
+            public void onHotKey(final HotKey hotKey) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        JOptionPane.showMessageDialog(frame, "Hooray: " + hotKey);
+                    }
+                });
+            }
+        };
         grab.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String text = textField.getText();
                 if (text != null && text.length() > 0) {
                     provider.reset();
-                    provider.register(KeyStroke.getKeyStroke(text), new ActionListener() {
-                        public void actionPerformed(final ActionEvent e) {
-                            SwingUtilities.invokeLater(new Runnable() {
-                                public void run() {
-                                    JOptionPane.showMessageDialog(frame, "Hooray: " + e.getSource());
-                                }
-                            });
-                        }
-                    });
+                    provider.register(KeyStroke.getKeyStroke(text), listener);
                 }
             }
         });
@@ -74,10 +77,10 @@ public class AWTTest {
         JButton grabMedia = new JButton("Grab media keys");
         grabMedia.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                provider.register(MediaKey.MEDIA_NEXT_TRACK, new MediaListener(MediaKey.MEDIA_NEXT_TRACK));
-                provider.register(MediaKey.MEDIA_PLAY_PAUSE, new MediaListener(MediaKey.MEDIA_PLAY_PAUSE));
-                provider.register(MediaKey.MEDIA_PREV_TRACK, new MediaListener(MediaKey.MEDIA_PREV_TRACK));
-                provider.register(MediaKey.MEDIA_STOP, new MediaListener(MediaKey.MEDIA_STOP));
+                provider.register(MediaKey.MEDIA_NEXT_TRACK, listener);
+                provider.register(MediaKey.MEDIA_PLAY_PAUSE, listener);
+                provider.register(MediaKey.MEDIA_PREV_TRACK, listener);
+                provider.register(MediaKey.MEDIA_STOP, listener);
             }
         });
         box.add(grabMedia);
@@ -97,21 +100,5 @@ public class AWTTest {
         frame.setSize(300, 150);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
-    }
-
-    private static class MediaListener implements ActionListener {
-        private MediaKey key;
-
-        private MediaListener(MediaKey key) {
-            this.key = key;
-        }
-
-        public void actionPerformed(ActionEvent e) {
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    JOptionPane.showMessageDialog(null, "Hooray, media key: " + key);
-                }
-            });
-        }
     }
 }

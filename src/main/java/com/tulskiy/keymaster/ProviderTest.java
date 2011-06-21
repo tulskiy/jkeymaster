@@ -17,11 +17,11 @@
 
 package com.tulskiy.keymaster;
 
+import com.tulskiy.keymaster.common.HotKey;
+import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Author: Denis Tulskiy
@@ -33,9 +33,9 @@ public class ProviderTest {
 
         provider.init();
 
-        provider.register(KeyStroke.getKeyStroke("control alt D"), new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getSource());
+        provider.register(KeyStroke.getKeyStroke("control alt D"), new HotKeyListener() {
+            public void onHotKey(HotKey hotKey) {
+                System.out.println(hotKey);
                 SwingUtilities.invokeLater(new Runnable() {
                     public void run() {
                         provider.reset();
@@ -44,15 +44,10 @@ public class ProviderTest {
                 });
             }
         });
-        provider.register(KeyStroke.getKeyStroke("control shift F1"), new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getSource());
-            }
-        });
 
-        ActionListener listener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getSource());
+        HotKeyListener listener = new HotKeyListener() {
+            public void onHotKey(HotKey hotKey) {
+                System.out.println(hotKey);
             }
         };
         provider.register(KeyStroke.getKeyStroke("control shift 0"), listener);
@@ -75,23 +70,8 @@ public class ProviderTest {
         provider.register(KeyStroke.getKeyStroke("control shift COMMA"), listener);
         provider.register(KeyStroke.getKeyStroke("control shift PERIOD"), listener);
         provider.register(KeyStroke.getKeyStroke("control shift SEMICOLON"), listener);
-
-        provider.register(KeyStroke.getKeyStroke("control alt HOME"), new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getSource());
-            }
-        });
-
-        provider.register(KeyStroke.getKeyStroke("control alt PAGE_UP"), new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getSource());
-            }
-        });
-
-        provider.register(KeyStroke.getKeyStroke("control alt NUMPAD0"), new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(e.getSource());
-            }
-        });
+        provider.register(KeyStroke.getKeyStroke("control alt HOME"), listener);
+        provider.register(KeyStroke.getKeyStroke("control alt PAGE_UP"), listener);
+        provider.register(KeyStroke.getKeyStroke("control alt NUMPAD0"), listener);
     }
 }
