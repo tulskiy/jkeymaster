@@ -56,7 +56,7 @@ public class AWTTest {
         grab.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String text = textField.getText();
-                if (text != null && !text.isEmpty()) {
+                if (text != null && text.length() > 0) {
                     provider.reset();
                     provider.register(KeyStroke.getKeyStroke(text), new ActionListener() {
                         public void actionPerformed(final ActionEvent e) {

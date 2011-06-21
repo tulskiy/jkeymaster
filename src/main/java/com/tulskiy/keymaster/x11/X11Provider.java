@@ -23,10 +23,12 @@ import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import static com.tulskiy.keymaster.x11.LibX11.*;
-import static com.tulskiy.keymaster.x11.KeySymDef.*;
 
 /**
  * Author: Denis Tulskiy
@@ -40,7 +42,7 @@ public class X11Provider extends Provider {
     private boolean reset;
     private ErrorHandler errorHandler;
     private final Object lock = new Object();
-    private Deque<X11HotKey> registerQueue = new LinkedList<X11HotKey>();
+    private Queue<X11HotKey> registerQueue = new LinkedList<X11HotKey>();
     private List<X11HotKey> hotKeys = new ArrayList<X11HotKey>();
 
     public void init() {

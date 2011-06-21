@@ -23,7 +23,10 @@ import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 import static com.tulskiy.keymaster.windows.User32.*;
 
@@ -40,7 +43,7 @@ public class WindowsProvider extends Provider {
     private Thread thread;
 
     private Map<Integer, HotKey> hotKeys = new HashMap<Integer, HotKey>();
-    private Deque<HotKey> registerQueue = new LinkedList<HotKey>();
+    private Queue<HotKey> registerQueue = new LinkedList<HotKey>();
 
     public void init() {
         Runnable runnable = new Runnable() {
