@@ -22,17 +22,8 @@ public class AWTTest {
 
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
-        final Provider provider;
-        if (Platform.isX11()) {
-            provider = new X11Provider();
-        } else if (Platform.isWindows()) {
-            provider = new WindowsProvider();
-        } else if (Platform.isMac()) {
-            provider = new CarbonProvider();
-        } else {
-            System.out.println("No suitable provider!");
-            return;
-        }
+        final Provider provider = Provider.getCurrentProvider();
+
         provider.init();
         final JTextField textField = new JTextField();
         textField.setEditable(false);
@@ -42,7 +33,7 @@ public class AWTTest {
                 if (MODIFIERS.contains(e.getKeyCode()))
                     textField.setText("");
                 else
-                    textField.setText(KeyStroke.getKeyStrokeForEvent(e).toString());
+                    textField.setText(KeyStroke.getKeyStrokeForEvent(e).toString().replaceAll("pressed ", ""));
             }
         });
         frame.add(textField, BorderLayout.CENTER);

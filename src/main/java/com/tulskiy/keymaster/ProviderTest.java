@@ -15,16 +15,8 @@ import java.awt.event.ActionListener;
  */
 public class ProviderTest {
     public static void main(String[] args) {
-        final Provider provider;
+        final Provider provider = Provider.getCurrentProvider();
 
-        if (Platform.isX11()) {
-            provider = new X11Provider();
-        } else if (Platform.isWindows()) {
-            provider = new WindowsProvider();
-        } else {
-            System.out.println("No suitable provider!");
-            return;
-        }
         provider.init();
 
         provider.register(KeyStroke.getKeyStroke("control alt D"), new ActionListener() {
