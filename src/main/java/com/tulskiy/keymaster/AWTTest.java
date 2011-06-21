@@ -17,12 +17,8 @@
 
 package com.tulskiy.keymaster;
 
-import com.sun.jna.Platform;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
-import com.tulskiy.keymaster.osx.CarbonProvider;
-import com.tulskiy.keymaster.windows.WindowsProvider;
-import com.tulskiy.keymaster.x11.X11Provider;
 
 import javax.swing.*;
 import java.awt.*;
