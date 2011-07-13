@@ -91,6 +91,10 @@ public class KeyMap {
                 modifiers |= MOD_ALT;
             }
         }
+
+        if (System.getProperty("os.name", "").startsWith("Windows 7")) {
+            modifiers |= MOD_NOREPEAT;
+        }
         return modifiers;
     }
 }
