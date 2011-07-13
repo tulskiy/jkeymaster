@@ -136,7 +136,9 @@ public class CarbonProvider extends Provider {
         hotKeys.put(id, hotKey);
     }
 
+    @Override
     public void stop() {
+        super.stop();
         logger.info("Stopping now");
         try {
             synchronized (lock) {

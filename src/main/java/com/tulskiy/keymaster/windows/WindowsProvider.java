@@ -127,7 +127,9 @@ public class WindowsProvider extends Provider {
         }
     }
 
+    @Override
     public void stop() {
+        super.stop();
         listen = false;
         if (thread != null) {
             try {

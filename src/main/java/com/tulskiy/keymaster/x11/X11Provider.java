@@ -160,7 +160,9 @@ public class X11Provider extends Provider {
         return ret;
     }
 
+    @Override
     public void stop() {
+        super.stop();
         if (thread != null) {
             listening = false;
             try {

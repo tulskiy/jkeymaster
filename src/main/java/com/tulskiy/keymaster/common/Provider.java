@@ -71,7 +71,9 @@ public abstract class Provider {
      *
      * @see Provider#reset()
      */
-    public abstract void stop();
+    public void stop() {
+        eventQueue.shutdown();
+    }
 
     /**
      * Reset all hotkey listeners
@@ -89,7 +91,7 @@ public abstract class Provider {
 
     /**
      * Register a media hotkey. Currently supported media keys are:
-     * <p/>
+     *
      * <ul>
      * <li>Play/Pause</li>
      * <li>Stop</li>
@@ -97,7 +99,7 @@ public abstract class Provider {
      * <li>Previous Track</li>
      * </ul>
      *
-     * @param mediaKey
+     * @param mediaKey media key to register
      * @param listener listener to be notified of hotkey events
      * @see MediaKey
      */
