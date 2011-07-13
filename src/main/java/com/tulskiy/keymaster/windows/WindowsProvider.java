@@ -54,7 +54,7 @@ public class WindowsProvider extends Provider {
                 while (listen) {
                     while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
                         if (msg.message == WM_HOTKEY) {
-                            int id = msg.wParam.intValue();
+                            int id = msg.wParam;
                             HotKey hotKey = hotKeys.get(id);
 
                             if (hotKey != null) {
