@@ -36,12 +36,8 @@ public class ProviderTest {
         provider.register(KeyStroke.getKeyStroke("control alt D"), new HotKeyListener() {
             public void onHotKey(HotKey hotKey) {
                 System.out.println(hotKey);
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        provider.reset();
-                        provider.stop();
-                    }
-                });
+                provider.reset();
+                provider.stop();
             }
         });
 
