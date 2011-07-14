@@ -25,7 +25,7 @@ import java.awt.event.InputEvent;
 import java.util.HashMap;
 
 import static com.tulskiy.keymaster.x11.KeySymDef.*;
-import static com.tulskiy.keymaster.x11.LibX11.*;
+import static com.tulskiy.keymaster.x11.X11.*;
 import static java.awt.event.KeyEvent.*;
 
 /**
@@ -111,7 +111,7 @@ public class KeyMap {
         }
 
         if (ret != -1) {
-            return XKeysymToKeycode(display, ret);
+            return Lib.XKeysymToKeycode(display, ret);
         } else {
             return 0;
         }
@@ -133,7 +133,7 @@ public class KeyMap {
                 code = XF86XK_AudioStop;
                 break;
         }
-        return XKeysymToKeycode(display, code);
+        return Lib.XKeysymToKeycode(display, code);
     }
 
     public static int getModifiers(KeyStroke keyCode) {

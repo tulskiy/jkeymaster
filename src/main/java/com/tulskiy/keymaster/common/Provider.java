@@ -20,7 +20,7 @@ package com.tulskiy.keymaster.common;
 import com.sun.jna.Platform;
 import com.tulskiy.keymaster.osx.CarbonProvider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
-import com.tulskiy.keymaster.x11.X11Provider;
+import com.tulskiy.keymaster.x11.X11ProviderIndirect;
 
 import javax.swing.*;
 import java.util.concurrent.ExecutorService;
@@ -46,7 +46,7 @@ public abstract class Provider {
      */
     public static Provider getCurrentProvider() {
         if (Platform.isX11()) {
-            return new X11Provider();
+            return new X11ProviderIndirect();
         } else if (Platform.isWindows()) {
             return new WindowsProvider();
         } else if (Platform.isMac()) {
@@ -91,7 +91,7 @@ public abstract class Provider {
 
     /**
      * Register a media hotkey. Currently supported media keys are:
-     *
+     * <p/>
      * <ul>
      * <li>Play/Pause</li>
      * <li>Stop</li>
