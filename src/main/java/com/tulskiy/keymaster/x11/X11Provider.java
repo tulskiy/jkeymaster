@@ -17,6 +17,7 @@
 
 package com.tulskiy.keymaster.x11;
 
+import com.sun.jna.NativeLong;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
@@ -36,7 +37,7 @@ import static com.tulskiy.keymaster.x11.LibX11.*;
  */
 public class X11Provider extends Provider {
     private Display display;
-    private Window window;
+    private NativeLong window;
     private boolean listening;
     private Thread thread;
     private boolean reset;
