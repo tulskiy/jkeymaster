@@ -18,6 +18,7 @@
 package com.tulskiy.keymaster.x11;
 
 import com.sun.jna.NativeLong;
+import com.sun.jna.Pointer;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
@@ -36,7 +37,7 @@ import static com.tulskiy.keymaster.x11.LibX11.*;
  * Date: 6/13/11
  */
 public class X11Provider extends Provider {
-    private Display display;
+    private Pointer display;
     private NativeLong window;
     private boolean listening;
     private Thread thread;
@@ -199,7 +200,7 @@ public class X11Provider extends Provider {
     }
 
     class ErrorHandler implements XErrorHandler {
-        public int apply(Display display, XErrorEvent errorEvent) {
+        public int apply(Pointer display, XErrorEvent errorEvent) {
             byte[] buf = new byte[1024];
             XGetErrorText(display, errorEvent.error_code, buf, buf.length);
             int len = 0;

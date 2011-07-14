@@ -17,6 +17,7 @@
 
 package com.tulskiy.keymaster.x11;
 
+import com.sun.jna.Pointer;
 import com.tulskiy.keymaster.common.MediaKey;
 
 import javax.swing.*;
@@ -92,7 +93,7 @@ public class KeyMap {
         put(XF86XK_AudioStop, XF86XK_AudioStop);
     }};
 
-    public static byte getCode(KeyStroke keyStroke, Display display) {
+    public static byte getCode(KeyStroke keyStroke, Pointer display) {
         int code = keyStroke.getKeyCode();
 
         int ret = -1;
@@ -116,7 +117,7 @@ public class KeyMap {
         }
     }
 
-    public static byte getMediaCode(MediaKey mediaKey, Display display) {
+    public static byte getMediaCode(MediaKey mediaKey, Pointer display) {
         int code = 0;
         switch (mediaKey) {
             case MEDIA_NEXT_TRACK:

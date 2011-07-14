@@ -41,31 +41,28 @@ public class LibX11 {
     public static final int Mod4Mask = (1 << 6);
     public static final int Mod5Mask = (1 << 7);
 
-    public static native Display XOpenDisplay(String name);
+    public static native Pointer XOpenDisplay(String name);
 
-    public static native NativeLong XDefaultRootWindow(Display display);
+    public static native NativeLong XDefaultRootWindow(Pointer display);
 
-    public static native byte XKeysymToKeycode(Display display, long keysym);
+    public static native byte XKeysymToKeycode(Pointer display, long keysym);
 
-    public static native int XGrabKey(Display display, int code, int modifiers, NativeLong root, boolean ownerEvents, int pointerMode, int keyBoardMode);
+    public static native int XGrabKey(Pointer display, int code, int modifiers, NativeLong root, boolean ownerEvents, int pointerMode, int keyBoardMode);
 
-    public static native int XUngrabKey(Display display, int code, int modifiers, NativeLong NativeLong);
+    public static native int XUngrabKey(Pointer display, int code, int modifiers, NativeLong NativeLong);
 
-    public static native int XNextEvent(Display display, XEvent event);
+    public static native int XNextEvent(Pointer display, XEvent event);
 
-    public static native int XPending(Display display);
+    public static native int XPending(Pointer display);
 
-    public static native int XCloseDisplay(Display display);
+    public static native int XCloseDisplay(Pointer display);
 
     public static native XErrorHandler XSetErrorHandler(XErrorHandler errorHandler);
 
-    public static native int XGetErrorText(Display display, int code, byte[] buffer, int len);
+    public static native int XGetErrorText(Pointer display, int code, byte[] buffer, int len);
 
     public interface XErrorHandler extends Callback {
-        public int apply(Display display, XErrorEvent errorEvent);
-    }
-
-    public static class Display extends PointerType {
+        public int apply(Pointer display, XErrorEvent errorEvent);
     }
 
     public static class XEvent extends Union {
@@ -78,7 +75,7 @@ public class LibX11 {
         public int type;            // of event
         public NativeLong serial;   // # of last request processed by server
         public int send_event;      // true if this came from a SendEvent request
-        public Display display;     // public Display the event was read from
+        public Pointer display;     // public Display the event was read from
         public NativeLong window;         // "event" window it is reported relative to
         public NativeLong root;           // root window that the event occurred on
         public NativeLong subwindow;      // child window
@@ -92,7 +89,7 @@ public class LibX11 {
 
     public static class XErrorEvent extends Structure {
         public int type;
-        public Display display;     // Display the event was read from
+        public Pointer display;     // Display the event was read from
         public NativeLong resourceid;     // resource id
         public NativeLong serial;   // serial number of failed request
         public byte error_code;     // error code of failed request
