@@ -162,7 +162,6 @@ public class X11Provider extends Provider {
 
     @Override
     public void stop() {
-        super.stop();
         if (thread != null) {
             listening = false;
             try {
@@ -172,6 +171,7 @@ public class X11Provider extends Provider {
                 e.printStackTrace();
             }
         }
+        super.stop();
     }
 
     public void register(KeyStroke keyCode, HotKeyListener listener) {

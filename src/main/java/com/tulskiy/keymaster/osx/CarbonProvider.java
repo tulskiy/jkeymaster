@@ -138,7 +138,6 @@ public class CarbonProvider extends Provider {
 
     @Override
     public void stop() {
-        super.stop();
         logger.info("Stopping now");
         try {
             synchronized (lock) {
@@ -152,6 +151,7 @@ public class CarbonProvider extends Provider {
         if (eventHandlerReference.getValue() != null) {
             Lib.RemoveEventHandler(eventHandlerReference.getValue());
         }
+        super.stop();
     }
 
     public void reset() {

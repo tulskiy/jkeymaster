@@ -129,7 +129,6 @@ public class WindowsProvider extends Provider {
 
     @Override
     public void stop() {
-        super.stop();
         listen = false;
         if (thread != null) {
             try {
@@ -138,5 +137,6 @@ public class WindowsProvider extends Provider {
                 e.printStackTrace();
             }
         }
+        super.stop();
     }
 }
