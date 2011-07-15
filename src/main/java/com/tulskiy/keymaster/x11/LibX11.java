@@ -47,9 +47,9 @@ public class LibX11 {
 
     public static native byte XKeysymToKeycode(Pointer display, long keysym);
 
-    public static native int XGrabKey(Pointer display, int code, int modifiers, NativeLong root, boolean ownerEvents, int pointerMode, int keyBoardMode);
+    public static native int XGrabKey(Pointer display, int code, int modifiers, NativeLong root, int ownerEvents, int pointerMode, int keyBoardMode);
 
-    public static native int XUngrabKey(Pointer display, int code, int modifiers, NativeLong NativeLong);
+    public static native int XUngrabKey(Pointer display, int code, int modifiers, NativeLong root);
 
     public static native int XNextEvent(Pointer display, XEvent event);
 

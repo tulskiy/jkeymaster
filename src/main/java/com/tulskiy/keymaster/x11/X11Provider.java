@@ -121,7 +121,7 @@ public class X11Provider extends Provider {
         for (int i = 0; i < 16; i++) {
             int flags = correctModifiers(modifiers, i);
 
-            XGrabKey(display, code, flags, window, true, GrabModeAsync, GrabModeAsync);
+            XGrabKey(display, code, flags, window, 1, GrabModeAsync, GrabModeAsync);
         }
     }
 
@@ -129,7 +129,7 @@ public class X11Provider extends Provider {
         byte keyCode = KeyMap.getMediaCode(hotKey.mediaKey, display);
         hotKey.modifiers = 0;
         hotKey.code = keyCode;
-        XGrabKey(display, keyCode, 0, window, true, GrabModeAsync, GrabModeAsync);
+        XGrabKey(display, keyCode, 0, window, 1, GrabModeAsync, GrabModeAsync);
     }
 
     private void resetAll() {

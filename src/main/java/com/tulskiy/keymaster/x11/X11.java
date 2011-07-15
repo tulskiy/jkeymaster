@@ -44,9 +44,9 @@ public interface X11 extends Library {
 
     public byte XKeysymToKeycode(Pointer display, long keysym);
 
-    public int XGrabKey(Pointer display, int code, int modifiers, NativeLong root, boolean ownerEvents, int pointerMode, int keyBoardMode);
+    public int XGrabKey(Pointer display, int code, int modifiers, NativeLong root, int ownerEvents, int pointerMode, int keyBoardMode);
 
-    public int XUngrabKey(Pointer display, int code, int modifiers, NativeLong NativeLong);
+    public int XUngrabKey(Pointer display, int code, int modifiers, NativeLong root);
 
     public int XNextEvent(Pointer display, XEvent event);
 
