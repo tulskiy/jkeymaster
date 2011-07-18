@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import static com.tulskiy.keymaster.x11.LibX11.*;
+import static com.tulskiy.keymaster.x11.X11.*;
 
 /**
  * Author: Denis Tulskiy
@@ -51,16 +51,16 @@ public class X11Provider extends Provider {
         Runnable runnable = new Runnable() {
             public void run() {
                 logger.info("Starting X11 global hotkey provider");
-                display = XOpenDisplay(null);
+                display = Lib.XOpenDisplay(null);
                 errorHandler = new ErrorHandler();
-                XSetErrorHandler(errorHandler);
-                window = XDefaultRootWindow(display);
+                Lib.XSetErrorHandler(errorHandler);
+                window = Lib.XDefaultRootWindow(display);
                 listening = true;
                 XEvent event = new XEvent();
 
                 while (listening) {
-                    while (XPending(display) > 0) {
-                        XNextEvent(display, event);
+                    while (Lib.XPending(display) > 0) {
+                        Lib.XNextEvent(display, event);
                         if (event.type == KeyPress) {
                             XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
                             for (X11HotKey hotKey : hotKeys) {
@@ -121,7 +121,7 @@ public class X11Provider extends Provider {
         for (int i = 0; i < 16; i++) {
             int flags = correctModifiers(modifiers, i);
 
-            XGrabKey(display, code, flags, window, 1, GrabModeAsync, GrabModeAsync);
+            Lib.XGrabKey(display, code, flags, window, 1, GrabModeAsync, GrabModeAsync);
         }
     }
 
@@ -129,7 +129,7 @@ public class X11Provider extends Provider {
         byte keyCode = KeyMap.getMediaCode(hotKey.mediaKey, display);
         hotKey.modifiers = 0;
         hotKey.code = keyCode;
-        XGrabKey(display, keyCode, 0, window, 1, GrabModeAsync, GrabModeAsync);
+        Lib.XGrabKey(display, keyCode, 0, window, 1, GrabModeAsync, GrabModeAsync);
     }
 
     private void resetAll() {
@@ -139,10 +139,10 @@ public class X11Provider extends Provider {
                 for (int i = 0; i < 16; i++) {
                     int flags = correctModifiers(modifiers, i);
 
-                    XUngrabKey(display, hotKey.code, flags, window);
+                    Lib.XUngrabKey(display, hotKey.code, flags, window);
                 }
             } else {
-                XUngrabKey(display, hotKey.code, 0, window);
+                Lib.XUngrabKey(display, hotKey.code, 0, window);
             }
         }
 
@@ -168,7 +168,7 @@ public class X11Provider extends Provider {
             listening = false;
             try {
                 thread.join();
-                XCloseDisplay(display);
+                Lib.XCloseDisplay(display);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -202,7 +202,7 @@ public class X11Provider extends Provider {
     class ErrorHandler implements XErrorHandler {
         public int apply(Pointer display, XErrorEvent errorEvent) {
             byte[] buf = new byte[1024];
-            XGetErrorText(display, errorEvent.error_code, buf, buf.length);
+            Lib.XGetErrorText(display, errorEvent.error_code, buf, buf.length);
             int len = 0;
             while (buf[len] != 0) len++;
             logger.warning("Error: " + new String(buf, 0, len));

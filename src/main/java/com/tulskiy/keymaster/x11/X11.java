@@ -23,6 +23,7 @@ import com.sun.jna.*;
  * Author: Denis Tulskiy
  * Date: 7/14/11
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public interface X11 extends Library {
     public static X11 Lib = (X11) Native.loadLibrary("X11", X11.class);
 
