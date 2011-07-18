@@ -35,8 +35,6 @@ public interface Carbon extends Library {
     public static final int optionKey = 0x0800;
     public static final int controlKey = 0x1000;
 
-    public Pointer GetApplicationEventTarget();
-
     public Pointer GetEventDispatcherTarget();
 
     /* OSStatus InstallEventHandler(EventTargetRef inTarget, EventHandlerUPP inHandler, ItemCount inNumTypes, const EventTypeSpec* inList, void* inUserData, EventHandlerRef *outRef) */
@@ -70,6 +68,7 @@ public interface Carbon extends Library {
 
     /* typedef OSStatus (*EventHandlerProcPtr) ( EventHandlerCallRef inHandlerCallRef, EventRef inEvent, void * inUserData ); */
     public static interface EventHandlerProcPtr extends Callback {
+        @SuppressWarnings({"UnusedDeclaration"})
         public int callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData);
     }
 }
