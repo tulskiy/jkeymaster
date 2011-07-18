@@ -21,8 +21,9 @@ import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.tulskiy.keymaster.osx.Carbon.*;
 import static java.awt.event.KeyEvent.*;
-import static com.tulskiy.keymaster.osx.CarbonLib.*;
 
 /**
  * Author: Denis Tulskiy

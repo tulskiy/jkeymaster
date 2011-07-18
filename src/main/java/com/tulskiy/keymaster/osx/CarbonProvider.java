@@ -30,7 +30,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import static com.tulskiy.keymaster.osx.CarbonLib.*;
+import static com.tulskiy.keymaster.osx.Carbon.*;
 
 /**
  * Author: Denis Tulskiy
@@ -182,7 +182,7 @@ public class CarbonProvider extends Provider {
         return (bytes[0] << 24) + (bytes[1] << 16) + (bytes[2] << 8) + bytes[3];
     }
 
-    private class EventHandler implements CarbonLib.EventHandlerProcPtr {
+    private class EventHandler implements Carbon.EventHandlerProcPtr {
         public int callback(Pointer inHandlerCallRef, Pointer inEvent, Pointer inUserData) {
             EventHotKeyID eventHotKeyID = new EventHotKeyID();
             int ret = Lib.GetEventParameter(inEvent, kEventParamDirectObject, typeEventHotKeyID, null, eventHotKeyID.size(), null, eventHotKeyID);

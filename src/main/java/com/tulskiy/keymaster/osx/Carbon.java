@@ -27,8 +27,8 @@ import java.nio.IntBuffer;
  * Date: 6/15/11
  */
 
-public interface CarbonLib extends Library {
-    public static CarbonLib Lib = (CarbonLib) Native.loadLibrary("Carbon", CarbonLib.class);
+public interface Carbon extends Library {
+    public static Carbon Lib = (Carbon) Native.loadLibrary("Carbon", Carbon.class);
 
     public static final int cmdKey = 0x0100;
     public static final int shiftKey = 0x0200;
