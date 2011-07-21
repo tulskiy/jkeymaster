@@ -177,18 +177,21 @@ public class X11Provider extends Provider {
     }
 
     public void register(KeyStroke keyCode, HotKeyListener listener) {
+        addListener(new HotKey(keyCode), listener);
         synchronized (lock) {
-            registerQueue.add(new X11HotKey(keyCode, listener));
+            registerQueue.add(new X11HotKey(keyCode));
         }
     }
 
     public void register(MediaKey mediaKey, HotKeyListener listener) {
+        addListener(new HotKey(mediaKey), listener);
         synchronized (lock) {
-            registerQueue.add(new X11HotKey(mediaKey, listener));
+            registerQueue.add(new X11HotKey(mediaKey));
         }
     }
 
     public void reset() {
+        super.reset();
         synchronized (lock) {
             reset = true;
             try {
@@ -214,12 +217,12 @@ public class X11Provider extends Provider {
         byte code;
         int modifiers;
 
-        X11HotKey(KeyStroke keyStroke, HotKeyListener listener) {
-            super(keyStroke, listener);
+        X11HotKey(KeyStroke keyStroke) {
+            super(keyStroke);
         }
 
-        X11HotKey(MediaKey mediaKey, HotKeyListener listener) {
-            super(mediaKey, listener);
+        X11HotKey(MediaKey mediaKey) {
+            super(mediaKey);
         }
     }
 }

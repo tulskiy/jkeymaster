@@ -28,22 +28,39 @@ import javax.swing.*;
 public class HotKey {
     public final KeyStroke keyStroke;
     public final MediaKey mediaKey;
-    public final HotKeyListener listener;
 
-    public HotKey(KeyStroke keyStroke, HotKeyListener listener) {
+    public HotKey(KeyStroke keyStroke) {
         this.keyStroke = keyStroke;
-        this.listener = listener;
         this.mediaKey = null;
     }
 
-    public HotKey(MediaKey mediaKey, HotKeyListener listener) {
+    public HotKey(MediaKey mediaKey) {
         this.keyStroke = null;
-        this.listener = listener;
         this.mediaKey = mediaKey;
     }
 
     public boolean isMedia() {
         return mediaKey != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        HotKey hotKey = (HotKey) o;
+
+        if (keyStroke != null ? !keyStroke.equals(hotKey.keyStroke) : hotKey.keyStroke != null) return false;
+        if (mediaKey != hotKey.mediaKey) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = keyStroke != null ? keyStroke.hashCode() : 0;
+        result = 31 * result + (mediaKey != null ? mediaKey.hashCode() : 0);
+        return result;
     }
 
     @Override

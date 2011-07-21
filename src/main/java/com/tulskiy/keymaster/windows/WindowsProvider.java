@@ -105,18 +105,21 @@ public class WindowsProvider extends Provider {
     }
 
     public void register(KeyStroke keyCode, HotKeyListener listener) {
+        addListener(new HotKey(keyCode), listener);
         synchronized (lock) {
-            registerQueue.add(new HotKey(keyCode, listener));
+            registerQueue.add(new HotKey(keyCode));
         }
     }
 
     public void register(MediaKey mediaKey, HotKeyListener listener) {
+        addListener(new HotKey(mediaKey), listener);
         synchronized (lock) {
-            registerQueue.add(new HotKey(mediaKey, listener));
+            registerQueue.add(new HotKey(mediaKey));
         }
     }
 
     public void reset() {
+        super.reset();
         synchronized (lock) {
             reset = true;
             try {

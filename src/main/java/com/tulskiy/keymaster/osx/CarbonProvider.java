@@ -45,8 +45,8 @@ public class CarbonProvider extends Provider {
 
     private static int idSeq = 1;
 
-    private Map<Integer, OSXHotKey> hotKeys = new HashMap<Integer, OSXHotKey>();
-    private Queue<OSXHotKey> registerQueue = new LinkedList<OSXHotKey>();
+    private final Map<Integer, OSXHotKey> hotKeys = new HashMap<Integer, OSXHotKey>();
+    private final Queue<OSXHotKey> registerQueue = new LinkedList<OSXHotKey>();
     private final Object lock = new Object();
     private boolean listen;
     private boolean reset;
@@ -155,6 +155,7 @@ public class CarbonProvider extends Provider {
     }
 
     public void reset() {
+        super.reset();
         synchronized (lock) {
             reset = true;
             lock.notify();
@@ -167,14 +168,15 @@ public class CarbonProvider extends Provider {
     }
 
     public void register(KeyStroke keyCode, HotKeyListener listener) {
+        addListener(new HotKey(keyCode), listener);
         synchronized (lock) {
-            registerQueue.add(new OSXHotKey(keyCode, listener));
+            registerQueue.add(new OSXHotKey(keyCode));
             lock.notify();
         }
     }
 
     public void register(MediaKey mediaKey, HotKeyListener listener) {
-        logger.warning("Media keys are not supported on this platform");
+        throw new UnsupportedOperationException("Media keys are not yet supported on this platform");
     }
 
     private static int OS_TYPE(String osType) {
@@ -197,11 +199,11 @@ public class CarbonProvider extends Provider {
         }
     }
 
-    class OSXHotKey extends HotKey {
+    private static class OSXHotKey extends HotKey {
         PointerByReference handler;
 
-        public OSXHotKey(KeyStroke keyStroke, HotKeyListener listener) {
-            super(keyStroke, listener);
+        public OSXHotKey(KeyStroke keyStroke) {
+            super(keyStroke);
         }
     }
 

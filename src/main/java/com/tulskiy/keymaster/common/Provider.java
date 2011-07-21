@@ -23,8 +23,8 @@ import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
 
 import javax.swing.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.List;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 /**
@@ -35,6 +35,8 @@ import java.util.logging.Logger;
  */
 public abstract class Provider {
     public static final Logger logger = Logger.getLogger(Provider.class.getName());
+
+    private final ConcurrentMap<HotKey, List<HotKeyListener>> listeners = new ConcurrentHashMap<HotKey, List<HotKeyListener>>();
 
     /**
      * Get global hotkey provider for current platform
@@ -78,7 +80,9 @@ public abstract class Provider {
     /**
      * Reset all hotkey listeners
      */
-    public abstract void reset();
+    public void reset() {
+        listeners.clear();
+    }
 
     /**
      * Register a global hotkey. Only keyCode and modifiers fields are respected
@@ -105,24 +109,41 @@ public abstract class Provider {
      */
     public abstract void register(MediaKey mediaKey, HotKeyListener listener);
 
+
+    protected void addListener(HotKey key, HotKeyListener listener) {
+        List<HotKeyListener> listenersList = listeners.get(key);
+        if (listenersList == null) {
+            listeners.putIfAbsent(key, new CopyOnWriteArrayList<HotKeyListener>());
+        }
+        listenersList = listeners.get(key);
+        listenersList.add(listener);
+    }
+
     /**
      * Helper method fro providers to fire hotkey event in a separate thread
      *
      * @param hotKey hotkey to fire
      */
     protected void fireEvent(HotKey hotKey) {
-        eventQueue.execute(new HotKeyEvent(hotKey));
+        List<HotKeyListener> listenerList = listeners.get(hotKey);
+        if (listenerList != null) {
+            for (HotKeyListener listener : listenerList) {
+                eventQueue.execute(new HotKeyEvent(listener, hotKey));
+            }
+        }
     }
 
-    private class HotKeyEvent implements Runnable {
-        private HotKey hotKey;
+    private static class HotKeyEvent implements Runnable {
+        private final HotKey hotKey;
+        private final HotKeyListener listener;
 
-        private HotKeyEvent(HotKey hotKey) {
+        private HotKeyEvent(HotKeyListener listener, HotKey hotKey) {
+            this.listener = listener;
             this.hotKey = hotKey;
         }
 
         public void run() {
-            hotKey.listener.onHotKey(hotKey);
+            listener.onHotKey(hotKey);
         }
     }
 
