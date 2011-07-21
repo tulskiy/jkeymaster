@@ -36,7 +36,7 @@ import java.util.logging.Logger;
 public abstract class Provider {
     public static final Logger logger = Logger.getLogger(Provider.class.getName());
 
-    private final ConcurrentMap<HotKey, List<HotKeyListener>> listeners = new ConcurrentHashMap<HotKey, List<HotKeyListener>>();
+    private final ConcurrentMap<HotKey, List<HotKeyEvent>> listeners = new ConcurrentHashMap<HotKey, List<HotKeyEvent>>();
 
     /**
      * Get global hotkey provider for current platform
@@ -111,12 +111,12 @@ public abstract class Provider {
 
 
     protected void addListener(HotKey key, HotKeyListener listener) {
-        List<HotKeyListener> listenersList = listeners.get(key);
+        List<HotKeyEvent> listenersList = listeners.get(key);
         if (listenersList == null) {
-            listeners.putIfAbsent(key, new CopyOnWriteArrayList<HotKeyListener>());
+            listeners.putIfAbsent(key, new CopyOnWriteArrayList<HotKeyEvent>());
         }
         listenersList = listeners.get(key);
-        listenersList.add(listener);
+        listenersList.add(new HotKeyEvent(listener, key));
     }
 
     /**
@@ -125,10 +125,10 @@ public abstract class Provider {
      * @param hotKey hotkey to fire
      */
     protected void fireEvent(HotKey hotKey) {
-        List<HotKeyListener> listenerList = listeners.get(hotKey);
+        List<HotKeyEvent> listenerList = listeners.get(hotKey);
         if (listenerList != null) {
-            for (HotKeyListener listener : listenerList) {
-                eventQueue.execute(new HotKeyEvent(listener, hotKey));
+            for (HotKeyEvent event : listenerList) {
+                eventQueue.execute(event);
             }
         }
     }

@@ -25,10 +25,8 @@ import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static com.tulskiy.keymaster.x11.X11.*;
 
@@ -44,8 +42,7 @@ public class X11Provider extends Provider {
     private boolean reset;
     private ErrorHandler errorHandler;
     private final Object lock = new Object();
-    private Queue<X11HotKey> registerQueue = new LinkedList<X11HotKey>();
-    private List<X11HotKey> hotKeys = new ArrayList<X11HotKey>();
+    private final Set<X11HotKey> hotKeys = new CopyOnWriteArraySet<X11HotKey>();
 
     public void init() {
         Runnable runnable = new Runnable() {
@@ -63,14 +60,12 @@ public class X11Provider extends Provider {
                         Lib.XNextEvent(display, event);
                         if (event.type == KeyPress) {
                             XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
-                            for (X11HotKey hotKey : hotKeys) {
-                                int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
-                                if (hotKey.code == (byte) xkey.keycode && hotKey.modifiers == state) {
-                                    logger.info("Received event for hotkey: " + hotKey);
-                                    fireEvent(hotKey);
-                                    break;
-                                }
-                            }
+                            int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
+                            byte code = (byte) xkey.keycode;
+
+                            X11HotKey hotKey = new X11HotKey(KeyStroke.getKeyStroke(code, state), code, state);
+                            logger.info("Received event for hotkey: " + hotKey);
+                            fireEvent(hotKey);
                         }
                     }
 
@@ -80,17 +75,6 @@ public class X11Provider extends Provider {
                             resetAll();
                             reset = false;
                             lock.notify();
-                        }
-
-                        while (!registerQueue.isEmpty()) {
-                            X11HotKey hotKey = registerQueue.poll();
-                            logger.info("Registering hotkey: " + hotKey);
-                            if (hotKey.isMedia()) {
-                                registerMedia(display, window, hotKey);
-                            } else {
-                                register(display, window, hotKey);
-                            }
-                            hotKeys.add(hotKey);
                         }
 
                         try {
@@ -110,34 +94,12 @@ public class X11Provider extends Provider {
         thread.start();
     }
 
-    private static void register(Pointer display, NativeLong window, X11HotKey hotKey) {
-        byte code = KeyMap.getCode(hotKey.keyStroke, display);
-        if (code == 0) {
-            return;
-        }
-        int modifiers = KeyMap.getModifiers(hotKey.keyStroke);
-        hotKey.code = code;
-        hotKey.modifiers = modifiers;
-        for (int i = 0; i < 16; i++) {
-            int flags = correctModifiers(modifiers, i);
-
-            Lib.XGrabKey(display, code, flags, window, 1, GrabModeAsync, GrabModeAsync);
-        }
-    }
-
-    private static void registerMedia(Pointer display, NativeLong window, X11HotKey hotKey) {
-        byte keyCode = KeyMap.getMediaCode(hotKey.mediaKey, display);
-        hotKey.modifiers = 0;
-        hotKey.code = keyCode;
-        Lib.XGrabKey(display, keyCode, 0, window, 1, GrabModeAsync, GrabModeAsync);
-    }
-
     private void resetAll() {
         for (X11HotKey hotKey : hotKeys) {
             if (!hotKey.isMedia()) {
                 int modifiers = hotKey.modifiers;
                 for (int i = 0; i < 16; i++) {
-                    int flags = correctModifiers(modifiers, i);
+                    int flags = X11Helper.createX11Modifiers(modifiers, i);
 
                     Lib.XUngrabKey(display, hotKey.code, flags, window);
                 }
@@ -147,19 +109,6 @@ public class X11Provider extends Provider {
         }
 
         hotKeys.clear();
-    }
-
-    private static int correctModifiers(int modifiers, int flags) {
-        int ret = modifiers;
-        if ((flags & 1) != 0)
-            ret |= LockMask;
-        if ((flags & 2) != 0)
-            ret |= Mod2Mask;
-        if ((flags & 4) != 0)
-            ret |= Mod3Mask;
-        if ((flags & 8) != 0)
-            ret |= Mod5Mask;
-        return ret;
     }
 
     @Override
@@ -176,18 +125,19 @@ public class X11Provider extends Provider {
         super.stop();
     }
 
-    public void register(KeyStroke keyCode, HotKeyListener listener) {
-        addListener(new HotKey(keyCode), listener);
-        synchronized (lock) {
-            registerQueue.add(new X11HotKey(keyCode));
-        }
+    public void register(KeyStroke key, HotKeyListener listener) {
+        addListener(new HotKey(key), listener);
+        byte code = X11Helper.createX11CodeForKeyStroke(key, display);
+        X11HotKey hotKey = new X11HotKey(key, code, KeyMap.getModifiers(key));
+        hotKeys.add(hotKey);
+        X11Helper.registerKeyStroke(display, window, hotKey);
     }
 
     public void register(MediaKey mediaKey, HotKeyListener listener) {
         addListener(new HotKey(mediaKey), listener);
-        synchronized (lock) {
-            registerQueue.add(new X11HotKey(mediaKey));
-        }
+        X11HotKey hotKey = new X11HotKey(mediaKey, KeyMap.getMediaCode(mediaKey, display));
+        hotKeys.add(hotKey);
+        X11Helper.registerMedia(display, window, hotKey);
     }
 
     public void reset() {
@@ -202,7 +152,7 @@ public class X11Provider extends Provider {
         }
     }
 
-    class ErrorHandler implements XErrorHandler {
+    private static class ErrorHandler implements XErrorHandler {
         public int apply(Pointer display, XErrorEvent errorEvent) {
             byte[] buf = new byte[1024];
             Lib.XGetErrorText(display, errorEvent.error_code, buf, buf.length);
@@ -210,19 +160,6 @@ public class X11Provider extends Provider {
             while (buf[len] != 0) len++;
             logger.warning("Error: " + new String(buf, 0, len));
             return 0;
-        }
-    }
-
-    class X11HotKey extends HotKey {
-        byte code;
-        int modifiers;
-
-        X11HotKey(KeyStroke keyStroke) {
-            super(keyStroke);
-        }
-
-        X11HotKey(MediaKey mediaKey) {
-            super(mediaKey);
         }
     }
 }
