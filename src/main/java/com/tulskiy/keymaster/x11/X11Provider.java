@@ -86,9 +86,9 @@ public class X11Provider extends Provider {
                             X11HotKey hotKey = registerQueue.poll();
                             logger.info("Registering hotkey: " + hotKey);
                             if (hotKey.isMedia()) {
-                                registerMedia(hotKey);
+                                registerMedia(display, window, hotKey);
                             } else {
-                                register(hotKey);
+                                register(display, window, hotKey);
                             }
                             hotKeys.add(hotKey);
                         }
@@ -110,7 +110,7 @@ public class X11Provider extends Provider {
         thread.start();
     }
 
-    private void register(X11HotKey hotKey) {
+    private static void register(Pointer display, NativeLong window, X11HotKey hotKey) {
         byte code = KeyMap.getCode(hotKey.keyStroke, display);
         if (code == 0) {
             return;
@@ -125,7 +125,7 @@ public class X11Provider extends Provider {
         }
     }
 
-    private void registerMedia(X11HotKey hotKey) {
+    private static void registerMedia(Pointer display, NativeLong window, X11HotKey hotKey) {
         byte keyCode = KeyMap.getMediaCode(hotKey.mediaKey, display);
         hotKey.modifiers = 0;
         hotKey.code = keyCode;
@@ -149,7 +149,7 @@ public class X11Provider extends Provider {
         hotKeys.clear();
     }
 
-    private int correctModifiers(int modifiers, int flags) {
+    private static int correctModifiers(int modifiers, int flags) {
         int ret = modifiers;
         if ((flags & 1) != 0)
             ret |= LockMask;
