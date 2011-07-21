@@ -26,18 +26,20 @@ import javax.swing.*;
  * Date: 6/20/11
  */
 public class HotKey {
-    public KeyStroke keyStroke;
-    public MediaKey mediaKey;
-    public HotKeyListener listener;
+    public final KeyStroke keyStroke;
+    public final MediaKey mediaKey;
+    public final HotKeyListener listener;
 
     public HotKey(KeyStroke keyStroke, HotKeyListener listener) {
         this.keyStroke = keyStroke;
         this.listener = listener;
+        this.mediaKey = null;
     }
 
     public HotKey(MediaKey mediaKey, HotKeyListener listener) {
-        this.mediaKey = mediaKey;
+        this.keyStroke = null;
         this.listener = listener;
+        this.mediaKey = mediaKey;
     }
 
     public boolean isMedia() {
