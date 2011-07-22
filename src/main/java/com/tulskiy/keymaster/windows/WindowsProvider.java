@@ -23,8 +23,11 @@ import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.tulskiy.keymaster.windows.User32.*;
@@ -36,56 +39,26 @@ import static com.tulskiy.keymaster.windows.User32.*;
 public class WindowsProvider extends Provider {
     private static final AtomicInteger idSeq = new AtomicInteger(0);
 
-    private boolean listen;
-    private Boolean reset = false;
-    private final Object lock = new Object();
-    private Thread thread;
-
     private final Map<Integer, HotKey> hotKeys = new ConcurrentHashMap<Integer, HotKey>();
 
-    public void init() {
+    public void init(ScheduledExecutorService executorService) {
         Runnable runnable = new Runnable() {
             public void run() {
                 logger.info("Starting Windows global hotkey provider");
                 MSG msg = new MSG();
-                listen = true;
-                while (listen) {
-                    while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
-                        if (msg.message == WM_HOTKEY) {
-                            int id = msg.wParam;
-                            HotKey hotKey = hotKeys.get(id);
+                while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
+                    if (msg.message == WM_HOTKEY) {
+                        int id = msg.wParam;
+                        HotKey hotKey = hotKeys.get(id);
 
-                            if (hotKey != null) {
-                                fireEvent(hotKey);
-                            }
-                        }
-                    }
-
-                    synchronized (lock) {
-                        if (reset) {
-                            logger.info("Reset hotkeys");
-                            for (Integer id : hotKeys.keySet()) {
-                                UnregisterHotKey(null, id);
-                            }
-
-                            hotKeys.clear();
-                            reset = false;
-                            lock.notify();
-                        }
-
-                        try {
-                            lock.wait(300);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                        if (hotKey != null) {
+                            fireEvent(hotKey);
                         }
                     }
                 }
-                logger.info("Exit listening thread");
             }
         };
-
-        thread = new Thread(runnable);
-        thread.start();
+        executorService.scheduleWithFixedDelay(runnable, 0, 300, TimeUnit.MILLISECONDS);
     }
 
     private static int registerHotKey(HotKey hotKey) {
@@ -115,26 +88,17 @@ public class WindowsProvider extends Provider {
 
     public void reset() {
         super.reset();
-        synchronized (lock) {
-            reset = true;
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        Map<Integer, HotKey> keys = new HashMap<Integer, HotKey>(hotKeys);
+        hotKeys.clear();
+
+        for (Integer id : keys.keySet()) {
+            UnregisterHotKey(null, id);
         }
     }
 
     @Override
     public void stop() {
-        listen = false;
-        if (thread != null) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        reset();
         super.stop();
     }
 }

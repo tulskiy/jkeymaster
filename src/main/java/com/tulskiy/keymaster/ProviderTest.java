@@ -20,6 +20,8 @@ package com.tulskiy.keymaster;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 
@@ -28,16 +30,19 @@ import javax.swing.*;
  * Date: 6/13/11
  */
 public class ProviderTest {
-    public static void main(String[] args) {
+    private static final Logger log = LoggerFactory.getLogger(ProviderTest.class);
+
+    public static void main(String[] args) throws InterruptedException {
         final Provider provider = Provider.getCurrentProvider();
 
-        provider.init();
 
-        provider.register(KeyStroke.getKeyStroke("control alt D"), new HotKeyListener() {
+        final Object lock = new Object();
+        register(provider, KeyStroke.getKeyStroke("control alt D"), new HotKeyListener() {
             public void onHotKey(HotKey hotKey) {
                 System.out.println(hotKey);
-                provider.reset();
-                provider.stop();
+                synchronized (lock) {
+                    lock.notifyAll();
+                }
             }
         });
 
@@ -46,28 +51,40 @@ public class ProviderTest {
                 System.out.println("Hey, I found new event! : " + hotKey);
             }
         };
-        provider.register(KeyStroke.getKeyStroke("control shift 0"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift PLUS"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift INSERT"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift ESCAPE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift BACK_QUOTE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift SLASH"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift BACK_SLASH"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift DIVIDE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift MULTIPLY"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift ENTER"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift MINUS"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift BACK_QUOTE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift UP"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift INSERT"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift DELETE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift ADD"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift SUBTRACT"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift COMMA"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift PERIOD"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift SEMICOLON"), listener);
-        provider.register(KeyStroke.getKeyStroke("control alt HOME"), listener);
-        provider.register(KeyStroke.getKeyStroke("control alt PAGE_UP"), listener);
-        provider.register(KeyStroke.getKeyStroke("control alt NUMPAD0"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift 0"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift PLUS"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift INSERT"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift ESCAPE"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift BACK_QUOTE"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift SLASH"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift BACK_SLASH"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift DIVIDE"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift MULTIPLY"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift ENTER"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift MINUS"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift BACK_QUOTE"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift UP"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift INSERT"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift DELETE"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift ADD"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift SUBTRACT"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift COMMA"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift PERIOD"), listener);
+        register(provider, KeyStroke.getKeyStroke("control shift SEMICOLON"), listener);
+        register(provider, KeyStroke.getKeyStroke("control alt HOME"), listener);
+        register(provider, KeyStroke.getKeyStroke("control alt PAGE_UP"), listener);
+        register(provider, KeyStroke.getKeyStroke("control alt NUMPAD0"), listener);
+        synchronized (lock) {
+            lock.wait();
+        }
+        provider.stop();
+    }
+
+    private static void register(Provider provider, KeyStroke keyStroke, HotKeyListener listener) {
+        try {
+            provider.register(keyStroke, listener);
+        } catch (Exception e) {
+            log.error("Error", e);
+        }
     }
 }

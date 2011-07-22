@@ -39,7 +39,6 @@ public class AWTTest {
         final JFrame frame = new JFrame();
         final Provider provider = Provider.getCurrentProvider();
 
-        provider.init();
         final JTextField textField = new JTextField();
         textField.setEditable(false);
         textField.addKeyListener(new KeyAdapter() {

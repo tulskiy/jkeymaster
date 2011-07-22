@@ -48,24 +48,27 @@ public abstract class Provider {
      * @see CarbonProvider
      */
     public static Provider getCurrentProvider() {
+        Provider provider;
         if (Platform.isX11()) {
-            return new X11Provider();
+            provider = new X11Provider();
         } else if (Platform.isWindows()) {
-            return new WindowsProvider();
+            provider = new WindowsProvider();
         } else if (Platform.isMac()) {
-            return new CarbonProvider();
+            provider = new CarbonProvider();
         } else {
             logger.warn("No suitable provider for " + System.getProperty("os.name"));
             return null;
         }
+        provider.init(provider.eventQueue);
+        return provider;
     }
 
-    private ExecutorService eventQueue = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService eventQueue = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Initialize provider. Starts main thread that will listen to hotkey events
      */
-    public abstract void init();
+    protected abstract void init(ScheduledExecutorService executorService);
 
     /**
      * Stop the provider. Stops main thread and frees any resources.

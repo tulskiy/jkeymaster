@@ -25,8 +25,11 @@ import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static com.tulskiy.keymaster.x11.X11.*;
 
@@ -37,92 +40,40 @@ import static com.tulskiy.keymaster.x11.X11.*;
 public class X11Provider extends Provider {
     private Pointer display;
     private NativeLong window;
-    private boolean listening;
-    private Thread thread;
-    private boolean reset;
     private ErrorHandler errorHandler;
-    private final Object lock = new Object();
     private final Set<X11HotKey> hotKeys = new CopyOnWriteArraySet<X11HotKey>();
 
-    public void init() {
+    protected void init(ScheduledExecutorService executorService) {
+        logger.info("Starting X11 global hotkey provider");
+        display = Lib.XOpenDisplay(null);
+        errorHandler = new ErrorHandler();
+        Lib.XSetErrorHandler(errorHandler);
+        window = Lib.XDefaultRootWindow(display);
+
         Runnable runnable = new Runnable() {
             public void run() {
-                logger.info("Starting X11 global hotkey provider");
-                display = Lib.XOpenDisplay(null);
-                errorHandler = new ErrorHandler();
-                Lib.XSetErrorHandler(errorHandler);
-                window = Lib.XDefaultRootWindow(display);
-                listening = true;
                 XEvent event = new XEvent();
+                while (Lib.XPending(display) > 0) {
+                    Lib.XNextEvent(display, event);
+                    if (event.type == KeyPress) {
+                        XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
+                        int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
+                        byte code = (byte) xkey.keycode;
 
-                while (listening) {
-                    while (Lib.XPending(display) > 0) {
-                        Lib.XNextEvent(display, event);
-                        if (event.type == KeyPress) {
-                            XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
-                            int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
-                            byte code = (byte) xkey.keycode;
-
-                            X11HotKey hotKey = new X11HotKey(KeyStroke.getKeyStroke(code, state), code, state);
-                            logger.info("Received event for hotkey: " + hotKey);
-                            fireEvent(hotKey);
-                        }
+                        X11HotKey hotKey = new X11HotKey(KeyStroke.getKeyStroke(code, state), code, state);
+                        logger.info("Received event for hotkey: " + hotKey);
+                        fireEvent(hotKey);
                     }
-
-                    synchronized (lock) {
-                        if (reset) {
-                            logger.info("Reset hotkeys");
-                            resetAll();
-                            reset = false;
-                            lock.notify();
-                        }
-
-                        try {
-                            lock.wait(300);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
                 }
-
-                logger.info("Thread - stop listening");
             }
         };
-
-        thread = new Thread(runnable);
-        thread.start();
-    }
-
-    private void resetAll() {
-        for (X11HotKey hotKey : hotKeys) {
-            if (!hotKey.isMedia()) {
-                int modifiers = hotKey.modifiers;
-                for (int i = 0; i < 16; i++) {
-                    int flags = X11Helper.createX11Modifiers(modifiers, i);
-
-                    Lib.XUngrabKey(display, hotKey.code, flags, window);
-                }
-            } else {
-                Lib.XUngrabKey(display, hotKey.code, 0, window);
-            }
-        }
-
-        hotKeys.clear();
+        executorService.scheduleWithFixedDelay(runnable, 0, 300, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public void stop() {
-        if (thread != null) {
-            listening = false;
-            try {
-                thread.join();
-                Lib.XCloseDisplay(display);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         super.stop();
+        Lib.XCloseDisplay(display);
     }
 
     public void register(KeyStroke key, HotKeyListener listener) {
@@ -142,12 +93,22 @@ public class X11Provider extends Provider {
 
     public void reset() {
         super.reset();
-        synchronized (lock) {
-            reset = true;
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        resetAll();
+    }
+
+    private void resetAll() {
+        Set<X11HotKey> keys = new HashSet<X11HotKey>(hotKeys);
+        hotKeys.clear();
+
+        for (X11HotKey hotKey : keys) {
+            if (!hotKey.isMedia()) {
+                int modifiers = hotKey.modifiers;
+                for (int i = 0; i < 16; i++) {
+                    int flags = X11Helper.createX11Modifiers(modifiers, i);
+                    Lib.XUngrabKey(display, hotKey.code, flags, window);
+                }
+            } else {
+                Lib.XUngrabKey(display, hotKey.code, 0, window);
             }
         }
     }
