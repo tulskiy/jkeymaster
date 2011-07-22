@@ -158,7 +158,7 @@ public class X11Provider extends Provider {
             Lib.XGetErrorText(display, errorEvent.error_code, buf, buf.length);
             int len = 0;
             while (buf[len] != 0) len++;
-            logger.warning("Error: " + new String(buf, 0, len));
+            logger.warn("Error: " + new String(buf, 0, len));
             return 0;
         }
     }

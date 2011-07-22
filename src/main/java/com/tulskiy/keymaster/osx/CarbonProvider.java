@@ -103,7 +103,7 @@ public class CarbonProvider extends Provider {
         for (OSXHotKey hotKey : hotKeys.values()) {
             int ret = Lib.UnregisterEventHotKey(hotKey.handler.getValue());
             if (ret != 0) {
-                logger.warning("Could not unregister hotkey. Error code: " + ret);
+                logger.warn("Could not unregister hotkey. Error code: " + ret);
             }
         }
         hotKeys.clear();
@@ -155,7 +155,7 @@ public class CarbonProvider extends Provider {
             EventHotKeyID eventHotKeyID = new EventHotKeyID();
             int ret = Lib.GetEventParameter(inEvent, kEventParamDirectObject, typeEventHotKeyID, null, eventHotKeyID.size(), null, eventHotKeyID);
             if (ret != 0) {
-                logger.warning("Could not get event parameters. Error code: " + ret);
+                logger.warn("Could not get event parameters. Error code: " + ret);
             } else {
                 long eventId = eventHotKeyID.id;
                 logger.info("Received event id: " + eventId);

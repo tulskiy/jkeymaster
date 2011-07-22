@@ -21,11 +21,12 @@ import com.sun.jna.Platform;
 import com.tulskiy.keymaster.osx.CarbonProvider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.logging.Logger;
 
 /**
  * Main interface to global hotkey providers
@@ -34,7 +35,7 @@ import java.util.logging.Logger;
  * Date: 6/12/11
  */
 public abstract class Provider {
-    public static final Logger logger = Logger.getLogger(Provider.class.getName());
+    public static final Logger logger = LoggerFactory.getLogger(Provider.class);
 
     private final ConcurrentMap<HotKey, List<HotKeyEvent>> listeners = new ConcurrentHashMap<HotKey, List<HotKeyEvent>>();
 
@@ -54,7 +55,7 @@ public abstract class Provider {
         } else if (Platform.isMac()) {
             return new CarbonProvider();
         } else {
-            logger.warning("No suitable provider for " + System.getProperty("os.name"));
+            logger.warn("No suitable provider for " + System.getProperty("os.name"));
             return null;
         }
     }
