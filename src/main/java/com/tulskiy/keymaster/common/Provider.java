@@ -47,7 +47,7 @@ public abstract class Provider {
      * @see WindowsProvider
      * @see CarbonProvider
      */
-    public static Provider getCurrentProvider() {
+    public static Provider createProvider() {
         Provider provider;
         if (Platform.isX11()) {
             provider = new X11Provider();

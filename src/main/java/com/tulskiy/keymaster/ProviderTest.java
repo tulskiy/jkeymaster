@@ -33,7 +33,7 @@ public class ProviderTest {
     private static final Logger log = LoggerFactory.getLogger(ProviderTest.class);
 
     public static void main(String[] args) throws InterruptedException {
-        final Provider provider = Provider.getCurrentProvider();
+        final Provider provider = Provider.createProvider();
 
 
         final Object lock = new Object();

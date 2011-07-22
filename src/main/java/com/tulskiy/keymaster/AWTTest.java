@@ -37,7 +37,7 @@ public class AWTTest {
 
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
-        final Provider provider = Provider.getCurrentProvider();
+        final Provider provider = Provider.createProvider();
 
         final JTextField textField = new JTextField();
         textField.setEditable(false);
