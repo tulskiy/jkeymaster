@@ -34,8 +34,7 @@ API Example
 
 Main class is `Provider`. To get provider for current platform:
 
-    Provider provider = Provider.getCurrentProvider();
-    provider.init();
+    Provider provider = Provider.createProvider();
 
 Provider supports two methods for registering hotkeys - one accepts AWT KeyStroke:
 
@@ -50,7 +49,6 @@ hotkey, but all hotkeys can be reset.
 
 When you're done using the library, you need to reset hotkeys and stop the provider:
 
-    provider.reset();
     provider.stop();
 
 Feedback
