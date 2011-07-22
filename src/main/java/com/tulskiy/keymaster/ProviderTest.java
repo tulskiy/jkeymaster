@@ -43,7 +43,7 @@ public class ProviderTest {
 
         HotKeyListener listener = new HotKeyListener() {
             public void onHotKey(HotKey hotKey) {
-                System.out.println(hotKey);
+                System.out.println("Hey, I found new event! : " + hotKey);
             }
         };
         provider.register(KeyStroke.getKeyStroke("control shift 0"), listener);
