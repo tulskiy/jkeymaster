@@ -41,7 +41,7 @@ public class WindowsProvider extends Provider {
 
     private final Map<Integer, HotKey> hotKeys = new ConcurrentHashMap<Integer, HotKey>();
 
-    public void init(ScheduledExecutorService executorService) {
+    protected void init(ScheduledExecutorService executorService) {
         Runnable runnable = new Runnable() {
             public void run() {
                 logger.info("Starting Windows global hotkey provider");

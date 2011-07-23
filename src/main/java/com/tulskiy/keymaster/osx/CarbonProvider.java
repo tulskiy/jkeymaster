@@ -51,7 +51,7 @@ public class CarbonProvider extends Provider {
         this.eventHandlerReference = new PointerByReference();
     }
 
-    public void init(ScheduledExecutorService executorService) {
+    protected void init(ScheduledExecutorService executorService) {
         logger.info("Installing Event Handler");
         EventHandlerProcPtr keyListener = new EventHandler(executorService);
 
