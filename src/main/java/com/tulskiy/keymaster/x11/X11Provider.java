@@ -19,10 +19,10 @@ package com.tulskiy.keymaster.x11;
 
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
-import com.tulskiy.keymaster.common.HotKey;
-import com.tulskiy.keymaster.common.HotKeyListener;
-import com.tulskiy.keymaster.common.MediaKey;
-import com.tulskiy.keymaster.common.Provider;
+import com.tulskiy.keymaster.*;
+import com.tulskiy.keymaster.HotKey;
+import com.tulskiy.keymaster.HotKeyListener;
+import com.tulskiy.keymaster.MediaKey;
 
 import javax.swing.*;
 import java.util.HashSet;
@@ -40,14 +40,12 @@ import static com.tulskiy.keymaster.x11.X11.*;
 public class X11Provider extends Provider {
     private final Pointer display;
     private final NativeLong window;
-    private final ErrorHandler errorHandler;
     private final Set<X11HotKey> hotKeys = new CopyOnWriteArraySet<X11HotKey>();
 
     public X11Provider() {
         logger.info("Starting X11 global hotkey provider");
         display = Lib.XOpenDisplay(null);
-        errorHandler = new ErrorHandler();
-        Lib.XSetErrorHandler(errorHandler);
+        Lib.XSetErrorHandler(new ErrorHandler());
         window = Lib.XDefaultRootWindow(display);
     }
 

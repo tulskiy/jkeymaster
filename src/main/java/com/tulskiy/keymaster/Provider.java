@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.keymaster.common;
+package com.tulskiy.keymaster;
 
 import com.sun.jna.Platform;
 import com.tulskiy.keymaster.osx.CarbonProvider;

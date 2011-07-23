@@ -1,7 +1,7 @@
 package com.tulskiy.keymaster.osx;
 
 import com.sun.jna.ptr.PointerByReference;
-import com.tulskiy.keymaster.common.HotKey;
+import com.tulskiy.keymaster.HotKey;
 
 import javax.swing.*;
 

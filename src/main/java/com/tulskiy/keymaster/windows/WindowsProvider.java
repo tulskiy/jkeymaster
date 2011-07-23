@@ -17,10 +17,10 @@
 
 package com.tulskiy.keymaster.windows;
 
-import com.tulskiy.keymaster.common.HotKey;
-import com.tulskiy.keymaster.common.HotKeyListener;
-import com.tulskiy.keymaster.common.MediaKey;
-import com.tulskiy.keymaster.common.Provider;
+import com.tulskiy.keymaster.*;
+import com.tulskiy.keymaster.HotKey;
+import com.tulskiy.keymaster.HotKeyListener;
+import com.tulskiy.keymaster.MediaKey;
 
 import javax.swing.*;
 import java.util.HashMap;

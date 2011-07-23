@@ -1,7 +1,7 @@
 package com.tulskiy.keymaster.osx;
 
 import com.sun.jna.ptr.PointerByReference;
-import com.tulskiy.keymaster.common.Provider;
+import com.tulskiy.keymaster.Provider;
 
 import javax.swing.*;
 import java.util.concurrent.atomic.AtomicInteger;

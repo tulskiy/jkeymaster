@@ -1,7 +1,7 @@
 package com.tulskiy.keymaster.x11;
 
-import com.tulskiy.keymaster.common.HotKey;
-import com.tulskiy.keymaster.common.MediaKey;
+import com.tulskiy.keymaster.HotKey;
+import com.tulskiy.keymaster.MediaKey;
 
 import javax.swing.*;
 

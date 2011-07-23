@@ -57,7 +57,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.tulskiy.keymaster.AWTTest</mainClass>
+                            <mainClass>com.tulskiy.keymaster.tests.AWTTest</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                         </manifest>

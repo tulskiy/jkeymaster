@@ -18,7 +18,7 @@
 package com.tulskiy.keymaster.x11;
 
 import com.sun.jna.Pointer;
-import com.tulskiy.keymaster.common.MediaKey;
+import com.tulskiy.keymaster.MediaKey;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;

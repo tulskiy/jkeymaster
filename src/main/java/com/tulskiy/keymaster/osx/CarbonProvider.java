@@ -19,9 +19,9 @@ package com.tulskiy.keymaster.osx;
 
 import com.sun.jna.Pointer;
 import com.sun.jna.ptr.PointerByReference;
-import com.tulskiy.keymaster.common.HotKeyListener;
-import com.tulskiy.keymaster.common.MediaKey;
-import com.tulskiy.keymaster.common.Provider;
+import com.tulskiy.keymaster.HotKeyListener;
+import com.tulskiy.keymaster.MediaKey;
+import com.tulskiy.keymaster.Provider;
 
 import javax.swing.*;
 import java.util.Map;

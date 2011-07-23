@@ -15,11 +15,11 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.keymaster;
+package com.tulskiy.keymaster.tests;
 
-import com.tulskiy.keymaster.common.HotKey;
-import com.tulskiy.keymaster.common.HotKeyListener;
-import com.tulskiy.keymaster.common.Provider;
+import com.tulskiy.keymaster.HotKey;
+import com.tulskiy.keymaster.HotKeyListener;
+import com.tulskiy.keymaster.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
