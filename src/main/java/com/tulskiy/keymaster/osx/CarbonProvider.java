@@ -45,14 +45,15 @@ public class CarbonProvider extends Provider {
 
     private final Map<Long, OSXHotKey> hotKeys = new ConcurrentHashMap<Long, OSXHotKey>();
 
-    private EventHandlerProcPtr keyListener;
-    private PointerByReference eventHandlerReference;
+    private final PointerByReference eventHandlerReference;
 
+    public CarbonProvider() {
+        this.eventHandlerReference = new PointerByReference();
+    }
 
     public void init(ScheduledExecutorService executorService) {
         logger.info("Installing Event Handler");
-        eventHandlerReference = new PointerByReference();
-        keyListener = new EventHandler(executorService);
+        EventHandlerProcPtr keyListener = new EventHandler(executorService);
 
         EventTypeSpec[] eventTypes = (EventTypeSpec[]) (new EventTypeSpec().toArray(1));
         eventTypes[0].eventClass = kEventClassKeyboard;

@@ -38,18 +38,20 @@ import static com.tulskiy.keymaster.x11.X11.*;
  * Date: 6/13/11
  */
 public class X11Provider extends Provider {
-    private Pointer display;
-    private NativeLong window;
-    private ErrorHandler errorHandler;
+    private final Pointer display;
+    private final NativeLong window;
+    private final ErrorHandler errorHandler;
     private final Set<X11HotKey> hotKeys = new CopyOnWriteArraySet<X11HotKey>();
 
-    protected void init(ScheduledExecutorService executorService) {
+    public X11Provider() {
         logger.info("Starting X11 global hotkey provider");
         display = Lib.XOpenDisplay(null);
         errorHandler = new ErrorHandler();
         Lib.XSetErrorHandler(errorHandler);
         window = Lib.XDefaultRootWindow(display);
+    }
 
+    protected void init(ScheduledExecutorService executorService) {
         Runnable runnable = new Runnable() {
             public void run() {
                 XEvent event = new XEvent();
