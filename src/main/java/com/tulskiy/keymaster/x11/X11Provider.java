@@ -120,8 +120,19 @@ public class X11Provider extends Provider {
             byte[] buf = new byte[1024];
             Lib.XGetErrorText(display, errorEvent.error_code, buf, buf.length);
             int len = 0;
-            while (buf[len] != 0) len++;
-            logger.warn("Error: " + new String(buf, 0, len));
+            while (buf[len] != 0 && len < buf.length) {
+                len++;
+            }
+
+            String errorMessage;
+            try {
+                errorMessage = new String(buf, 0, len);
+            } catch (Exception e) {
+                logger.warn("Can't decode error message.");
+                errorMessage = "Unknown. Buffer length " + len + " error code " + errorEvent.error_code;
+            }
+
+            logger.warn("Error: " + errorMessage);
             return 0;
         }
     }
