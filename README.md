@@ -57,9 +57,9 @@ If you need just to reset all key mapping use:
 
 Restrictions:
 
-	On Mac OS current implementation replaces existed hotkey mapping with own. This means that previous mapping doesn't
-	work while binding alive and application doesn't receive any messages about pressed keys.
-	(source: http://stackoverflow.com/questions/6186317/why-copy-and-paste-in-finder-doesnt-work-when-i-use-registereventhotkey-cocoa)
+On Mac OS current implementation replaces existed hotkey mapping with own. This means that previous mapping doesn't
+work while binding alive and application doesn't receive any messages about pressed keys.
+(source: http://stackoverflow.com/questions/6186317/why-copy-and-paste-in-finder-doesnt-work-when-i-use-registereventhotkey-cocoa)
 
 Feedback
 --------
