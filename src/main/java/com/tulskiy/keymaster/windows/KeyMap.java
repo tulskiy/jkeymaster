@@ -17,7 +17,7 @@
 
 package com.tulskiy.keymaster.windows;
 
-import com.tulskiy.keymaster.common.HotKey;
+import com.tulskiy.keymaster.HotKey;
 
 import javax.swing.*;
 import java.awt.event.InputEvent;

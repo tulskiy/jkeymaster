@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.keymaster.common;
+package com.tulskiy.keymaster;
 
 import javax.swing.*;
 
@@ -26,22 +26,41 @@ import javax.swing.*;
  * Date: 6/20/11
  */
 public class HotKey {
-    public KeyStroke keyStroke;
-    public MediaKey mediaKey;
-    public HotKeyListener listener;
+    public final KeyStroke keyStroke;
+    public final MediaKey mediaKey;
 
-    public HotKey(KeyStroke keyStroke, HotKeyListener listener) {
+    public HotKey(KeyStroke keyStroke) {
         this.keyStroke = keyStroke;
-        this.listener = listener;
+        this.mediaKey = null;
     }
 
-    public HotKey(MediaKey mediaKey, HotKeyListener listener) {
+    public HotKey(MediaKey mediaKey) {
+        this.keyStroke = null;
         this.mediaKey = mediaKey;
-        this.listener = listener;
     }
 
     public boolean isMedia() {
         return mediaKey != null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        HotKey hotKey = (HotKey) o;
+
+        if (keyStroke != null ? !keyStroke.equals(hotKey.keyStroke) : hotKey.keyStroke != null) return false;
+        if (mediaKey != hotKey.mediaKey) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = keyStroke != null ? keyStroke.hashCode() : 0;
+        result = 31 * result + (mediaKey != null ? mediaKey.hashCode() : 0);
+        return result;
     }
 
     @Override

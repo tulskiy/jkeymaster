@@ -34,8 +34,7 @@ API Example
 
 Main class is `Provider`. To get provider for current platform:
 
-    Provider provider = Provider.getCurrentProvider();
-    provider.init();
+    Provider provider = Provider.createProvider();
 
 Provider supports two methods for registering hotkeys - one accepts AWT KeyStroke:
 
@@ -50,8 +49,19 @@ hotkey, but all hotkeys can be reset.
 
 When you're done using the library, you need to reset hotkeys and stop the provider:
 
-    provider.reset();
     provider.stop();
+
+If you need just to reset all key mapping use:
+
+	provider.reset();
+
+Restrictions:
+
+On Mac OS current implementation replaces existed hotkey mapping with own. This means that previous mapping doesn't
+work while binding alive and all applications can't receive any messages about pressed keys.
+(source: http://stackoverflow.com/questions/6186317/why-copy-and-paste-in-finder-doesnt-work-when-i-use-registereventhotkey-cocoa)
+Also since you can bind keys without modifiers (like 'y' or '0') that can break your system totally and
+makes keyboard unreachable for whole system.
 
 Feedback
 --------

@@ -15,17 +15,18 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.keymaster.common;
+package com.tulskiy.keymaster;
 
 import com.sun.jna.Platform;
 import com.tulskiy.keymaster.osx.CarbonProvider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Logger;
+import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * Main interface to global hotkey providers
@@ -34,7 +35,9 @@ import java.util.logging.Logger;
  * Date: 6/12/11
  */
 public abstract class Provider {
-    public static final Logger logger = Logger.getLogger(Provider.class.getName());
+    public static final Logger logger = LoggerFactory.getLogger(Provider.class);
+
+    private final ConcurrentMap<HotKey, List<HotKeyEvent>> listeners = new ConcurrentHashMap<HotKey, List<HotKeyEvent>>();
 
     /**
      * Get global hotkey provider for current platform
@@ -44,25 +47,28 @@ public abstract class Provider {
      * @see WindowsProvider
      * @see CarbonProvider
      */
-    public static Provider getCurrentProvider() {
+    public static Provider createProvider() {
+        Provider provider;
         if (Platform.isX11()) {
-            return new X11Provider();
+            provider = new X11Provider();
         } else if (Platform.isWindows()) {
-            return new WindowsProvider();
+            provider = new WindowsProvider();
         } else if (Platform.isMac()) {
-            return new CarbonProvider();
+            provider = new CarbonProvider();
         } else {
-            logger.warning("No suitable provider for " + System.getProperty("os.name"));
+            logger.warn("No suitable provider for " + System.getProperty("os.name"));
             return null;
         }
+        provider.init(provider.eventQueue);
+        return provider;
     }
 
-    private ExecutorService eventQueue = Executors.newSingleThreadExecutor();
+    private final ScheduledExecutorService eventQueue = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * Initialize provider. Starts main thread that will listen to hotkey events
      */
-    public abstract void init();
+    protected abstract void init(ScheduledExecutorService executorService);
 
     /**
      * Stop the provider. Stops main thread and frees any resources.
@@ -78,7 +84,9 @@ public abstract class Provider {
     /**
      * Reset all hotkey listeners
      */
-    public abstract void reset();
+    public void reset() {
+        listeners.clear();
+    }
 
     /**
      * Register a global hotkey. Only keyCode and modifiers fields are respected
@@ -105,24 +113,41 @@ public abstract class Provider {
      */
     public abstract void register(MediaKey mediaKey, HotKeyListener listener);
 
+
+    protected void addListener(HotKey key, HotKeyListener listener) {
+        List<HotKeyEvent> listenersList = listeners.get(key);
+        if (listenersList == null) {
+            listeners.putIfAbsent(key, new CopyOnWriteArrayList<HotKeyEvent>());
+        }
+        listenersList = listeners.get(key);
+        listenersList.add(new HotKeyEvent(listener, key));
+    }
+
     /**
      * Helper method fro providers to fire hotkey event in a separate thread
      *
      * @param hotKey hotkey to fire
      */
     protected void fireEvent(HotKey hotKey) {
-        eventQueue.execute(new HotKeyEvent(hotKey));
+        List<HotKeyEvent> listenerList = listeners.get(hotKey);
+        if (listenerList != null) {
+            for (HotKeyEvent event : listenerList) {
+                eventQueue.execute(event);
+            }
+        }
     }
 
-    private class HotKeyEvent implements Runnable {
-        private HotKey hotKey;
+    private static class HotKeyEvent implements Runnable {
+        private final HotKey hotKey;
+        private final HotKeyListener listener;
 
-        private HotKeyEvent(HotKey hotKey) {
+        private HotKeyEvent(HotKeyListener listener, HotKey hotKey) {
+            this.listener = listener;
             this.hotKey = hotKey;
         }
 
         public void run() {
-            hotKey.listener.onHotKey(hotKey);
+            listener.onHotKey(hotKey);
         }
     }
 

@@ -17,16 +17,18 @@
 
 package com.tulskiy.keymaster.windows;
 
-import com.tulskiy.keymaster.common.HotKey;
-import com.tulskiy.keymaster.common.HotKeyListener;
-import com.tulskiy.keymaster.common.MediaKey;
-import com.tulskiy.keymaster.common.Provider;
+import com.tulskiy.keymaster.*;
+import com.tulskiy.keymaster.HotKey;
+import com.tulskiy.keymaster.HotKeyListener;
+import com.tulskiy.keymaster.MediaKey;
 
 import javax.swing.*;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.tulskiy.keymaster.windows.User32.*;
 
@@ -35,108 +37,68 @@ import static com.tulskiy.keymaster.windows.User32.*;
  * Date: 6/12/11
  */
 public class WindowsProvider extends Provider {
-    private static volatile int idSeq = 0;
+    private static final AtomicInteger idSeq = new AtomicInteger(0);
 
-    private boolean listen;
-    private Boolean reset = false;
-    private final Object lock = new Object();
-    private Thread thread;
+    private final Map<Integer, HotKey> hotKeys = new ConcurrentHashMap<Integer, HotKey>();
 
-    private Map<Integer, HotKey> hotKeys = new HashMap<Integer, HotKey>();
-    private Queue<HotKey> registerQueue = new LinkedList<HotKey>();
-
-    public void init() {
+    protected void init(ScheduledExecutorService executorService) {
         Runnable runnable = new Runnable() {
             public void run() {
                 logger.info("Starting Windows global hotkey provider");
                 MSG msg = new MSG();
-                listen = true;
-                while (listen) {
-                    while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
-                        if (msg.message == WM_HOTKEY) {
-                            int id = msg.wParam;
-                            HotKey hotKey = hotKeys.get(id);
+                while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
+                    if (msg.message == WM_HOTKEY) {
+                        int id = msg.wParam;
+                        HotKey hotKey = hotKeys.get(id);
 
-                            if (hotKey != null) {
-                                fireEvent(hotKey);
-                            }
-                        }
-                    }
-
-                    synchronized (lock) {
-                        if (reset) {
-                            logger.info("Reset hotkeys");
-                            for (Integer id : hotKeys.keySet()) {
-                                UnregisterHotKey(null, id);
-                            }
-
-                            hotKeys.clear();
-                            reset = false;
-                            lock.notify();
-                        }
-
-                        while (!registerQueue.isEmpty()) {
-                            register(registerQueue.poll());
-                        }
-                        try {
-                            lock.wait(300);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                        if (hotKey != null) {
+                            fireEvent(hotKey);
                         }
                     }
                 }
-                logger.info("Exit listening thread");
             }
         };
-
-        thread = new Thread(runnable);
-        thread.start();
+        executorService.scheduleWithFixedDelay(runnable, 0, 300, TimeUnit.MILLISECONDS);
     }
 
-    private void register(HotKey hotKey) {
-        int id = idSeq++;
+    private static int registerHotKey(HotKey hotKey) {
+        int id = idSeq.incrementAndGet();
         int code = KeyMap.getCode(hotKey);
         if (RegisterHotKey(null, id, KeyMap.getModifiers(hotKey.keyStroke), code)) {
             logger.info("Registering hotkey: " + hotKey);
-            hotKeys.put(id, hotKey);
+            return id;
         } else {
-            logger.warning("Could not register hotkey: " + hotKey);
+            throw new RuntimeException("Could not register hotkey: " + hotKey);
         }
     }
 
     public void register(KeyStroke keyCode, HotKeyListener listener) {
-        synchronized (lock) {
-            registerQueue.add(new HotKey(keyCode, listener));
-        }
+        registerAll(listener, new HotKey(keyCode));
     }
 
     public void register(MediaKey mediaKey, HotKeyListener listener) {
-        synchronized (lock) {
-            registerQueue.add(new HotKey(mediaKey, listener));
-        }
+        registerAll(listener, new HotKey(mediaKey));
+    }
+
+    private void registerAll(HotKeyListener listener, HotKey key) {
+        addListener(key, listener);
+        int id = registerHotKey(key);
+        hotKeys.put(id, key);
     }
 
     public void reset() {
-        synchronized (lock) {
-            reset = true;
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        super.reset();
+        Map<Integer, HotKey> keys = new HashMap<Integer, HotKey>(hotKeys);
+        hotKeys.clear();
+
+        for (Integer id : keys.keySet()) {
+            UnregisterHotKey(null, id);
         }
     }
 
     @Override
     public void stop() {
-        listen = false;
-        if (thread != null) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        reset();
         super.stop();
     }
 }
