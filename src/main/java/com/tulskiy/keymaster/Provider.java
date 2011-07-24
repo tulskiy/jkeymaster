@@ -91,11 +91,21 @@ public abstract class Provider {
     /**
      * Register a global hotkey. Only keyCode and modifiers fields are respected
      *
-     * @param keyCode  KeyStroke to register
+     * @param keyCode  KeyStroke to registerKey
      * @param listener listener to be notified of hotkey events
      * @see KeyStroke
+     * @throws RegistrationException if there was any error during key registration process
      */
-    public abstract void register(KeyStroke keyCode, HotKeyListener listener);
+    public void register(KeyStroke keyCode, HotKeyListener listener) {
+        try {
+            registerKey(keyCode, listener);
+        } catch (Exception e) {
+            throw new RegistrationException(e);
+        }
+    }
+
+
+    protected abstract void registerKey(KeyStroke keyCode, HotKeyListener listener);
 
     /**
      * Register a media hotkey. Currently supported media keys are:
@@ -107,11 +117,20 @@ public abstract class Provider {
      * <li>Previous Track</li>
      * </ul>
      *
-     * @param mediaKey media key to register
+     * @param mediaKey media key to registerKey
      * @param listener listener to be notified of hotkey events
      * @see MediaKey
+     * @throws RegistrationException if there was any error during key registration process
      */
-    public abstract void register(MediaKey mediaKey, HotKeyListener listener);
+    public void register(MediaKey mediaKey, HotKeyListener listener) {
+        try {
+            registerKey(mediaKey, listener);
+        } catch (Exception e) {
+            throw new RegistrationException(e);
+        }
+    }
+
+    protected abstract void registerKey(MediaKey mediaKey, HotKeyListener listener);
 
 
     protected void addListener(HotKey key, HotKeyListener listener) {

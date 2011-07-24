@@ -44,6 +44,8 @@ the other accepts a `MediaKey` parameter:
 
     provider.register(MediaKey.MEDIA_NEXT_TRACK, listener);
 
+If something goes wrong methods throw RegistrationException with brief problem description.
+
 For simplicity reasons, it is currently impossible to unregister some particular
 hotkey, but all hotkeys can be reset.
 

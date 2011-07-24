@@ -102,13 +102,13 @@ public class CarbonProvider extends Provider {
     }
 
 
-    public void register(KeyStroke keyCode, HotKeyListener listener) {
+    public void registerKey(KeyStroke keyCode, HotKeyListener listener) {
         OSXHotKey osxHotKey = OSXHelper.registerKeyStroke(keyCode);
         addListener(osxHotKey, listener);
         hotKeys.put(osxHotKey.id, osxHotKey);
     }
 
-    public void register(MediaKey mediaKey, HotKeyListener listener) {
+    public void registerKey(MediaKey mediaKey, HotKeyListener listener) {
         throw new UnsupportedOperationException("Media keys are not yet supported on this platform");
     }
 

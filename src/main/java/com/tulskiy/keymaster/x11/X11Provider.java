@@ -76,7 +76,7 @@ public class X11Provider extends Provider {
         Lib.XCloseDisplay(display);
     }
 
-    public void register(KeyStroke key, HotKeyListener listener) {
+    public void registerKey(KeyStroke key, HotKeyListener listener) {
         addListener(new HotKey(key), listener);
         byte code = X11Helper.createX11CodeForKeyStroke(key, display);
         X11HotKey hotKey = new X11HotKey(key, code, KeyMap.getModifiers(key));
@@ -84,7 +84,7 @@ public class X11Provider extends Provider {
         X11Helper.registerKeyStroke(display, window, hotKey);
     }
 
-    public void register(MediaKey mediaKey, HotKeyListener listener) {
+    public void registerKey(MediaKey mediaKey, HotKeyListener listener) {
         addListener(new HotKey(mediaKey), listener);
         X11HotKey hotKey = new X11HotKey(mediaKey, KeyMap.getMediaCode(mediaKey, display));
         hotKeys.add(hotKey);

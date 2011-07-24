@@ -72,11 +72,11 @@ public class WindowsProvider extends Provider {
         }
     }
 
-    public void register(KeyStroke keyCode, HotKeyListener listener) {
+    public void registerKey(KeyStroke keyCode, HotKeyListener listener) {
         registerAll(listener, new HotKey(keyCode));
     }
 
-    public void register(MediaKey mediaKey, HotKeyListener listener) {
+    public void registerKey(MediaKey mediaKey, HotKeyListener listener) {
         registerAll(listener, new HotKey(mediaKey));
     }
 
