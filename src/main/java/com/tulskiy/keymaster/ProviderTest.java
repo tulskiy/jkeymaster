@@ -29,9 +29,7 @@ import javax.swing.*;
  */
 public class ProviderTest {
     public static void main(String[] args) {
-        final Provider provider = Provider.getCurrentProvider();
-
-        provider.init();
+        final Provider provider = Provider.getCurrentProvider(false);
 
         provider.register(KeyStroke.getKeyStroke("control alt D"), new HotKeyListener() {
             public void onHotKey(HotKey hotKey) {

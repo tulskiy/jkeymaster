@@ -36,33 +36,42 @@ import java.util.logging.Logger;
 public abstract class Provider {
     public static final Logger logger = Logger.getLogger(Provider.class.getName());
 
+    private boolean useSwingEventQueue;
+
     /**
      * Get global hotkey provider for current platform
      *
+     * @param useSwingEventQueue whether the provider should be using Swing Event queue or a regular thread
      * @return new instance of Provider, or null if platform is not supported
      * @see X11Provider
      * @see WindowsProvider
      * @see CarbonProvider
      */
-    public static Provider getCurrentProvider() {
+    public static Provider getCurrentProvider(boolean useSwingEventQueue) {
+        Provider provider;
         if (Platform.isX11()) {
-            return new X11Provider();
+            provider = new X11Provider();
         } else if (Platform.isWindows()) {
-            return new WindowsProvider();
+            provider = new WindowsProvider();
         } else if (Platform.isMac()) {
-            return new CarbonProvider();
+            provider = new CarbonProvider();
         } else {
             logger.warning("No suitable provider for " + System.getProperty("os.name"));
             return null;
         }
+        provider.setUseSwingEventQueue(useSwingEventQueue);
+        provider.init();
+        return provider;
+
     }
 
-    private ExecutorService eventQueue = Executors.newSingleThreadExecutor();
+    private ExecutorService eventQueue;
+
 
     /**
      * Initialize provider. Starts main thread that will listen to hotkey events
      */
-    public abstract void init();
+    protected abstract void init();
 
     /**
      * Stop the provider. Stops main thread and frees any resources.
@@ -72,7 +81,8 @@ public abstract class Provider {
      * @see Provider#reset()
      */
     public void stop() {
-        eventQueue.shutdown();
+        if (eventQueue != null)
+            eventQueue.shutdown();
     }
 
     /**
@@ -111,7 +121,19 @@ public abstract class Provider {
      * @param hotKey hotkey to fire
      */
     protected void fireEvent(HotKey hotKey) {
-        eventQueue.execute(new HotKeyEvent(hotKey));
+        HotKeyEvent event = new HotKeyEvent(hotKey);
+        if (useSwingEventQueue) {
+            SwingUtilities.invokeLater(event);
+        } else {
+            if (eventQueue == null) {
+                eventQueue = Executors.newSingleThreadExecutor();
+            }
+            eventQueue.execute(event);
+        }
+    }
+
+    public void setUseSwingEventQueue(boolean useSwingEventQueue) {
+        this.useSwingEventQueue = useSwingEventQueue;
     }
 
     private class HotKeyEvent implements Runnable {

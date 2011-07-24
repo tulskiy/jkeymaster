@@ -37,9 +37,8 @@ public class AWTTest {
 
     public static void main(String[] args) {
         final JFrame frame = new JFrame();
-        final Provider provider = Provider.getCurrentProvider();
+        final Provider provider = Provider.getCurrentProvider(true);
 
-        provider.init();
         final JTextField textField = new JTextField();
         textField.setEditable(false);
         textField.addKeyListener(new KeyAdapter() {
@@ -57,11 +56,7 @@ public class AWTTest {
         box.add(grab);
         final HotKeyListener listener = new HotKeyListener() {
             public void onHotKey(final HotKey hotKey) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        JOptionPane.showMessageDialog(frame, "Hooray: " + hotKey);
-                    }
-                });
+                JOptionPane.showMessageDialog(frame, "Hooray: " + hotKey);
             }
         };
         grab.addActionListener(new ActionListener() {
