@@ -14,6 +14,27 @@ You will need Java 1.5+ and Maven to build
 
     mvn package
 
+Maven
+-----
+
+To use this library as a maven dependency, add the following repository
+to your project:
+
+    <repositories>
+        <repository>
+            <id>tulskiy/jkeymaster</id>
+            <url>http://tulskiy.github.com/jkeymaster/maven/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.tulskiy</groupId>
+            <artifactId>jkeymaster</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 Testing
 -------
 
