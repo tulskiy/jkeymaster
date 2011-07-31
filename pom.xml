@@ -75,6 +75,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
+                            <excludeGroupIds>junit</excludeGroupIds>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                         </configuration>
                     </execution>
@@ -96,6 +97,12 @@
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
             <version>3.2.7</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
