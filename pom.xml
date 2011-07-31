@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tulskiy.jkeymaster</groupId>
+    <groupId>com.tulskiy</groupId>
     <name>JKeyMaster</name>
     <description>Cross-platform Java provider for global hotkeys</description>
     <url>https://github.com/tulskiy/jkeymaster</url>
@@ -21,7 +21,7 @@
 
     <scm>
         <connection>scm:git://github.com/tulskiy/jkeymaster.git</connection>
-        <developerConnection>scm:git@github.com:tulskiy/jkeymaster.git</developerConnection>
+        <developerConnection>scm:git:https://tulskiy@github.com/tulskiy/jkeymaster.git</developerConnection>
         <url>https://github.com/tulskiy/jkeymaster</url>
     </scm>
 
@@ -29,6 +29,17 @@
         <system>github</system>
         <url>https://github.com/tulskiy/jkeymaster/issues</url>
     </issueManagement>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>repo</id>
+            <url>file:${project.basedir}/site/maven</url>
+        </snapshotRepository>
+        <site>
+            <id>gh-pages</id>
+            <url>file:${project.basedir}/site</url>
+        </site>
+    </distributionManagement>
 
     <developers>
         <developer>
@@ -78,6 +89,18 @@
                             <excludeGroupIds>junit</excludeGroupIds>
                             <outputDirectory>${project.build.directory}/lib</outputDirectory>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.1.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
