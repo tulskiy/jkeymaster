@@ -58,12 +58,19 @@ public class ProviderTest {
         robot.delay(3000);
 
         synchronized (lock) {
+            long start = System.currentTimeMillis();
             for (KeyStroke stroke : strokes) {
                 pressHotKey(stroke);
                 robot.delay(100);
             }
 
             while (!strokes.isEmpty()) {
+                if (System.currentTimeMillis() - start > 10000) {
+                    provider.reset();
+                    provider.stop();
+                    fail("Timeout. Perhaps some hotkeys failed to be registered");
+                }
+
                 lock.wait(300);
             }
         }
