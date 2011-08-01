@@ -31,10 +31,11 @@
     </issueManagement>
 
     <distributionManagement>
-        <snapshotRepository>
+        <repository>
             <id>repo</id>
+            <name>Github Pages</name>
             <url>file:${project.basedir}/site/maven</url>
-        </snapshotRepository>
+        </repository>
         <site>
             <id>gh-pages</id>
             <url>file:${project.basedir}/site</url>
