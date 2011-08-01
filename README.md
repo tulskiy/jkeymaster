@@ -31,7 +31,7 @@ to your project:
         <dependency>
             <groupId>com.tulskiy</groupId>
             <artifactId>jkeymaster</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 
