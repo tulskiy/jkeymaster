@@ -33,6 +33,7 @@
             <id>repo</id>
             <name>Github Pages</name>
             <url>file:${project.basedir}/site/maven</url>
+            <uniqueVersion>false</uniqueVersion>
         </repository>
         <site>
             <id>gh-pages</id>
