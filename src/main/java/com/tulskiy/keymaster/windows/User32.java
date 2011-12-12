@@ -51,10 +51,21 @@ public class User32 {
     public static class MSG extends Structure {
         public Pointer hWnd;
         public int message;
-        public int wParam;
-        public int lParam;
+        public Parameter wParam;
+        public Parameter lParam;
         public int time;
         public int x;
         public int y;
+    }
+
+    public static class Parameter extends IntegerType {
+        @SuppressWarnings("UnusedDeclaration")
+        public Parameter() {
+            this(0);
+        }
+
+        public Parameter(long value) {
+            super(Pointer.SIZE, value);
+        }
     }
 }
