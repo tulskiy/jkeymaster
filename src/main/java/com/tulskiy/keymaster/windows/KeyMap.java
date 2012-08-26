@@ -44,6 +44,7 @@ public class KeyMap {
         put(VK_MINUS, 0xBD);
         put(VK_SLASH, 0xBF);
         put(VK_SEMICOLON, 0xBA);
+        put(VK_PRINTSCREEN, 0x2C);
     }};
 
     public static int getCode(HotKey hotKey) {
