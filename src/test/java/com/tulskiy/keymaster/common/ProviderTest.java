@@ -1,6 +1,7 @@
 package com.tulskiy.keymaster.common;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.swing.*;
@@ -13,9 +14,12 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 /**
+ * Ignored test because it's success depeneds on current system setup
+ *
  * Author: Denis Tulskiy
  * Date: 7/25/11
  */
+@Ignore
 public class ProviderTest {
     private Robot robot;
     private final Object lock = new Object();
@@ -87,7 +91,7 @@ public class ProviderTest {
         if (Math.random() > 0.5) {
             modifiers |= InputEvent.ALT_DOWN_MASK;
         }
-        if (Math.random() > 0.5) {
+        if (Math.random() > 0.5 || modifiers == 0) {
             modifiers |= InputEvent.CTRL_DOWN_MASK;
         }
 
