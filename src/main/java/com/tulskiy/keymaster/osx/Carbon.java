@@ -21,6 +21,8 @@ import com.sun.jna.*;
 import com.sun.jna.ptr.PointerByReference;
 
 import java.nio.IntBuffer;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Author: Denis Tulskiy
@@ -52,12 +54,22 @@ public interface Carbon extends Library {
     public class EventTypeSpec extends Structure {
         public int eventClass;
         public int eventKind;
+
+        @Override
+        protected List getFieldOrder() {
+            return Arrays.asList("eventClass", "eventKind");
+        }
     }
 
     /* struct EventHotKeyID { OSType signature; UInt32 id; }; */
     public static class EventHotKeyID extends Structure {
         public int signature;
         public int id;
+
+        @Override
+        protected List getFieldOrder() {
+            return Arrays.asList("signature", "id");
+        }
 
         public static class ByValue extends EventHotKeyID implements Structure.ByValue {
 

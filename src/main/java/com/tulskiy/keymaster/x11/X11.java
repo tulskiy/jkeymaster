@@ -19,6 +19,9 @@ package com.tulskiy.keymaster.x11;
 
 import com.sun.jna.*;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Author: Denis Tulskiy
  * Date: 7/14/11
@@ -83,6 +86,12 @@ public interface X11 extends Library {
         public int state;           // key or button mask
         public int keycode;         // detail
         public int same_screen;     // same screen flag
+
+        @Override
+        protected List getFieldOrder() {
+            return Arrays.asList("type", "serial", "send_event", "display", "window", "root", "subwindow", "time",
+                    "x", "y", "x_root", "y_root", "state", "keycode", "same_screen");
+        }
     }
 
     public static class XErrorEvent extends Structure {
@@ -93,5 +102,10 @@ public interface X11 extends Library {
         public byte error_code;     // error code of failed request
         public byte request_code;   // Major op-code of failed request
         public byte minor_code;     // Minor op-code of failed request
+
+        @Override
+        protected List getFieldOrder() {
+            return Arrays.asList("type", "display", "serial", "error_code", "request_code", "minor_code", "resourceid");
+        }
     }
 }

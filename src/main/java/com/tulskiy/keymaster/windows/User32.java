@@ -20,6 +20,9 @@ package com.tulskiy.keymaster.windows;
 import com.sun.jna.*;
 import com.sun.jna.win32.W32APIOptions;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * Author: Denis Tulskiy
  * Date: 6/15/11
@@ -56,6 +59,11 @@ public class User32 {
         public int time;
         public int x;
         public int y;
+
+        @Override
+        protected List getFieldOrder() {
+            return Arrays.asList("hWnd", "message", "wParam", "lParam", "time", "x", "y");
+        }
     }
 
     public static class Parameter extends IntegerType {
