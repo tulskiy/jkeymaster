@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.tulskiy</groupId>
+    <groupId>com.github.tulskiy</groupId>
     <name>JKeyMaster</name>
     <description>Cross-platform Java provider for global hotkeys</description>
     <url>https://github.com/tulskiy/jkeymaster</url>
@@ -18,28 +19,15 @@
     </licenses>
 
     <scm>
-        <connection>scm:git://github.com/tulskiy/jkeymaster.git</connection>
-        <developerConnection>scm:git:https://tulskiy@github.com/tulskiy/jkeymaster.git</developerConnection>
-        <url>https://github.com/tulskiy/jkeymaster</url>
+        <connection>scm:git:git@github.com:tulskiy/jkeymaster.git</connection>
+        <developerConnection>scm:git:git@github.com:tulskiy/jkeymaster.git</developerConnection>
+        <url>git@github.com:tulskiy/jkeymaster</url>
     </scm>
 
     <issueManagement>
         <system>github</system>
         <url>https://github.com/tulskiy/jkeymaster/issues</url>
     </issueManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>repo</id>
-            <name>Github Pages</name>
-            <url>file:${project.basedir}/site/maven</url>
-            <uniqueVersion>false</uniqueVersion>
-        </repository>
-        <site>
-            <id>gh-pages</id>
-            <url>file:${project.basedir}/site</url>
-        </site>
-    </distributionManagement>
 
     <developers>
         <developer>
@@ -104,6 +92,24 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9</version>
+            </plugin>
         </plugins>
 
     </build>
@@ -121,4 +127,10 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 </project>
