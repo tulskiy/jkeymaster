@@ -139,6 +139,7 @@ public class KeySymDef {
     public static final int XK_braceright = 0x007d;  /* U+007D RIGHT CURLY BRACKET */
     public static final int XK_asciitilde = 0x007e;  /* U+007E TILDE */
 
+    public static final int XK_Print = 0xff61;  /* Insert, insert here */
     public static final int XK_Insert = 0xff63;  /* Insert, insert here */
 
     public static final int XF86XK_AudioPlay = 0x1008FF14;  /* Start playing of audio >   */

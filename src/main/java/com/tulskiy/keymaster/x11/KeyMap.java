@@ -87,6 +87,7 @@ public class KeyMap {
         put(VK_ADD, XK_KP_Add);
         put(VK_SUBTRACT, XK_KP_Subtract);
         put(VK_BEGIN, XK_KP_Begin);
+        put(VK_PRINTSCREEN, XK_Print);
         put(XF86XK_AudioNext, XF86XK_AudioNext);
         put(XF86XK_AudioPlay, XF86XK_AudioPlay);
         put(XF86XK_AudioPrev, XF86XK_AudioPrev);

@@ -113,6 +113,7 @@ public class X11Provider extends Provider {
     private void register(X11HotKey hotKey) {
         byte code = KeyMap.getCode(hotKey.keyStroke, display);
         if (code == 0) {
+            logger.warning("Could not find mapping for " + hotKey.keyStroke);
             return;
         }
         int modifiers = KeyMap.getModifiers(hotKey.keyStroke);
