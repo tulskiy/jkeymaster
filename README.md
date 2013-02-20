@@ -10,28 +10,18 @@ This is a java library that provides single interface to register Global Hotkeys
 Building
 --------
 
-You will need Java 1.5+ and Maven to build
+You will need Java 1.6+ and Maven to build
 
-    mvn package
+    mvn clean package
 
 Maven
 -----
 
-To use this library as a maven dependency, add the following repository
-to your project:
-
-    <repositories>
-        <repository>
-            <id>tulskiy/jkeymaster</id>
-            <url>http://tulskiy.github.com/jkeymaster/maven/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
-            <groupId>com.tulskiy</groupId>
+            <groupId>com.github.tulskiy</groupId>
             <artifactId>jkeymaster</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
         </dependency>
     </dependencies>
 
@@ -40,7 +30,7 @@ Testing
 
 To test that the library works on your system, run the jar file
 
-    java -jar jkeymaster-1.0-SNAPSHOT.jar
+    java -cp jkeymaster-1.1.jar com.tulskiy.keymaster.AWTTest
 
 It will open a simple window. At the top is a field that listens to key presses.
 Choose your hotkey and press `Grab` button. Check log output to see if it failed.
