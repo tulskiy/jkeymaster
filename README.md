@@ -45,8 +45,12 @@ API Example
 
 Main class is `Provider`. To get provider for current platform:
 
-    Provider provider = Provider.getCurrentProvider();
+    Provider provider = Provider.getCurrentProvider(useSwingEventQueue);
     provider.init();
+    
+where `useSwingEventQueue` is a boolean parameter specifying whether to fire events
+on swing event queue or just simple thread. Usefull when your hotkey listener will 
+directly access or modify some swing components.
 
 Provider supports two methods for registering hotkeys - one accepts AWT KeyStroke:
 
