@@ -67,6 +67,12 @@ When you're done using the library, you need to reset hotkeys and stop the provi
 
     provider.reset();
     provider.stop();
+    
+Clojure
+-------
+
+If you are interested in nicer api from clojure, check out a wrapper library 
+developed by Stian Håklev: https://github.com/houshuang/keymaster-clj
 
 Feedback
 --------
