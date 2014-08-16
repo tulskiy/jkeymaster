@@ -17,6 +17,8 @@ You will need Java 1.6+ and Maven to build
 Maven
 -----
 
+    Release version:
+    
     <dependencies>
         <dependency>
             <groupId>com.github.tulskiy</groupId>
@@ -24,6 +26,23 @@ Maven
             <version>1.1</version>
         </dependency>
     </dependencies>
+    
+    Snapshot version:
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.github.tulskiy</groupId>
+            <artifactId>jkeymaster</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+    
+    <repositories>
+        <repository>
+            <id>snapshots-repo</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
 
 Testing
 -------
