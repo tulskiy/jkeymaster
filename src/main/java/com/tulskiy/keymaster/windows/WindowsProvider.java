@@ -21,6 +21,8 @@ import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -35,6 +37,7 @@ import static com.tulskiy.keymaster.windows.User32.*;
  * Date: 6/12/11
  */
 public class WindowsProvider extends Provider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Provider.class);
     private static volatile int idSeq = 0;
 
     private boolean listen;
@@ -48,7 +51,7 @@ public class WindowsProvider extends Provider {
     public void init() {
         Runnable runnable = new Runnable() {
             public void run() {
-                logger.info("Starting Windows global hotkey provider");
+                LOGGER.info("Starting Windows global hotkey provider");
                 MSG msg = new MSG();
                 listen = true;
                 while (listen) {
@@ -65,7 +68,7 @@ public class WindowsProvider extends Provider {
 
                     synchronized (lock) {
                         if (reset) {
-                            logger.info("Reset hotkeys");
+                            LOGGER.info("Reset hotkeys");
                             for (Integer id : hotKeys.keySet()) {
                                 UnregisterHotKey(null, id);
                             }
@@ -85,7 +88,7 @@ public class WindowsProvider extends Provider {
                         }
                     }
                 }
-                logger.info("Exit listening thread");
+                LOGGER.info("Exit listening thread");
             }
         };
 
@@ -97,10 +100,10 @@ public class WindowsProvider extends Provider {
         int id = idSeq++;
         int code = KeyMap.getCode(hotKey);
         if (RegisterHotKey(null, id, KeyMap.getModifiers(hotKey.keyStroke), code)) {
-            logger.info("Registering hotkey: " + hotKey);
+            LOGGER.info("Registering hotkey: " + hotKey);
             hotKeys.put(id, hotKey);
         } else {
-            logger.warning("Could not register hotkey: " + hotKey);
+            LOGGER.warn("Could not register hotkey: " + hotKey);
         }
     }
 

@@ -23,6 +23,8 @@ import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.HashMap;
@@ -37,6 +39,7 @@ import static com.tulskiy.keymaster.osx.Carbon.*;
  * Date: 6/17/11
  */
 public class CarbonProvider extends Provider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CarbonProvider.class);
     private static final int kEventHotKeyPressed = 5;
 
     private static final int kEventClassKeyboard = OS_TYPE("keyb");
@@ -60,7 +63,7 @@ public class CarbonProvider extends Provider {
         thread = new Thread(new Runnable() {
             public void run() {
                 synchronized (lock) {
-                    logger.info("Installing Event Handler");
+                    LOGGER.info("Installing Event Handler");
                     eventHandlerReference = new PointerByReference();
                     keyListener = new EventHandler();
 
@@ -70,11 +73,11 @@ public class CarbonProvider extends Provider {
 
                     int status = Lib.InstallEventHandler(Lib.GetEventDispatcherTarget(), keyListener, 1, eventTypes, null, eventHandlerReference); //fHandlerRef
                     if (status != 0) {
-                        logger.warning("Could not register Event Handler, error code: " + status);
+                        LOGGER.warn("Could not register Event Handler, error code: " + status);
                     }
 
                     if (eventHandlerReference.getValue() == null) {
-                        logger.warning("Event Handler reference is null");
+                        LOGGER.warn("Event Handler reference is null");
                     }
                     listen = true;
                     while (listen) {
@@ -102,11 +105,11 @@ public class CarbonProvider extends Provider {
     }
 
     private void resetAll() {
-        logger.info("Resetting hotkeys");
+        LOGGER.info("Resetting hotkeys");
         for (OSXHotKey hotKey : hotKeys.values()) {
             int ret = Lib.UnregisterEventHotKey(hotKey.handler.getValue());
             if (ret != 0) {
-                logger.warning("Could not unregister hotkey. Error code: " + ret);
+                LOGGER.warn("Could not unregister hotkey. Error code: " + ret);
             }
         }
         hotKeys.clear();
@@ -123,22 +126,22 @@ public class CarbonProvider extends Provider {
         int status = Lib.RegisterEventHotKey(KeyMap.getKeyCode(keyCode), KeyMap.getModifier(keyCode), hotKeyReference, Lib.GetEventDispatcherTarget(), 0, gMyHotKeyRef);
 
         if (status != 0) {
-            logger.warning("Could not register HotKey: " + keyCode + ". Error code: " + status);
+            LOGGER.warn("Could not register HotKey: " + keyCode + ". Error code: " + status);
             return;
         }
 
         if (gMyHotKeyRef.getValue() == null) {
-            logger.warning("HotKey returned null handler reference");
+            LOGGER.warn("HotKey returned null handler reference");
             return;
         }
         hotKey.handler = gMyHotKeyRef;
-        logger.info("Registered hotkey: " + keyCode);
+        LOGGER.info("Registered hotkey: " + keyCode);
         hotKeys.put(id, hotKey);
     }
 
     @Override
     public void stop() {
-        logger.info("Stopping now");
+        LOGGER.info("Stopping now");
         try {
             synchronized (lock) {
                 listen = false;
@@ -174,7 +177,7 @@ public class CarbonProvider extends Provider {
     }
 
     public void register(MediaKey mediaKey, HotKeyListener listener) {
-        logger.warning("Media keys are not supported on this platform");
+        LOGGER.warn("Media keys are not supported on this platform");
     }
 
     private static int OS_TYPE(String osType) {
@@ -187,10 +190,10 @@ public class CarbonProvider extends Provider {
             EventHotKeyID eventHotKeyID = new EventHotKeyID();
             int ret = Lib.GetEventParameter(inEvent, kEventParamDirectObject, typeEventHotKeyID, null, eventHotKeyID.size(), null, eventHotKeyID);
             if (ret != 0) {
-                logger.warning("Could not get event parameters. Error code: " + ret);
+                LOGGER.warn("Could not get event parameters. Error code: " + ret);
             } else {
                 int eventId = eventHotKeyID.id;
-                logger.info("Received event id: " + eventId);
+                LOGGER.info("Received event id: " + eventId);
                 fireEvent(hotKeys.get(eventId));
             }
             return 0;

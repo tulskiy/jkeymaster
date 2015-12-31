@@ -21,20 +21,21 @@ import com.sun.jna.Platform;
 import com.tulskiy.keymaster.osx.CarbonProvider;
 import com.tulskiy.keymaster.windows.WindowsProvider;
 import com.tulskiy.keymaster.x11.X11Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 /**
  * Main interface to global hotkey providers
- * <p/>
+ * <p>
  * Author: Denis Tulskiy
  * Date: 6/12/11
  */
 public abstract class Provider {
-    public static final Logger logger = Logger.getLogger(Provider.class.getName());
+    private static final Logger LOGGER = LoggerFactory.getLogger(Provider.class);
 
     private boolean useSwingEventQueue;
 
@@ -56,7 +57,7 @@ public abstract class Provider {
         } else if (Platform.isMac()) {
             provider = new CarbonProvider();
         } else {
-            logger.warning("No suitable provider for " + System.getProperty("os.name"));
+            LOGGER.warn("No suitable provider for " + System.getProperty("os.name"));
             return null;
         }
         provider.setUseSwingEventQueue(useSwingEventQueue);
@@ -101,7 +102,7 @@ public abstract class Provider {
 
     /**
      * Register a media hotkey. Currently supported media keys are:
-     * <p/>
+     * <p>
      * <ul>
      * <li>Play/Pause</li>
      * <li>Stop</li>

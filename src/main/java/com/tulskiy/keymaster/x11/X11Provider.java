@@ -23,6 +23,8 @@ import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -37,6 +39,7 @@ import static com.tulskiy.keymaster.x11.X11.*;
  * Date: 6/13/11
  */
 public class X11Provider extends Provider {
+    private static final Logger LOGGER = LoggerFactory.getLogger(X11Provider.class);
     private Pointer display;
     private NativeLong window;
     private boolean listening;
@@ -50,7 +53,7 @@ public class X11Provider extends Provider {
     public void init() {
         Runnable runnable = new Runnable() {
             public void run() {
-                logger.info("Starting X11 global hotkey provider");
+                LOGGER.info("Starting X11 global hotkey provider");
                 display = Lib.XOpenDisplay(null);
                 errorHandler = new ErrorHandler();
                 Lib.XSetErrorHandler(errorHandler);
@@ -66,7 +69,7 @@ public class X11Provider extends Provider {
                             for (X11HotKey hotKey : hotKeys) {
                                 int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
                                 if (hotKey.code == (byte) xkey.keycode && hotKey.modifiers == state) {
-                                    logger.info("Received event for hotkey: " + hotKey);
+                                    LOGGER.info("Received event for hotkey: " + hotKey);
                                     fireEvent(hotKey);
                                     break;
                                 }
@@ -76,7 +79,7 @@ public class X11Provider extends Provider {
 
                     synchronized (lock) {
                         if (reset) {
-                            logger.info("Reset hotkeys");
+                            LOGGER.info("Reset hotkeys");
                             resetAll();
                             reset = false;
                             lock.notify();
@@ -84,7 +87,7 @@ public class X11Provider extends Provider {
 
                         while (!registerQueue.isEmpty()) {
                             X11HotKey hotKey = registerQueue.poll();
-                            logger.info("Registering hotkey: " + hotKey);
+                            LOGGER.info("Registering hotkey: " + hotKey);
                             if (hotKey.isMedia()) {
                                 registerMedia(hotKey);
                             } else {
@@ -102,7 +105,7 @@ public class X11Provider extends Provider {
 
                 }
 
-                logger.info("Thread - stop listening");
+                LOGGER.info("Thread - stop listening");
             }
         };
 
@@ -113,7 +116,7 @@ public class X11Provider extends Provider {
     private void register(X11HotKey hotKey) {
         byte code = KeyMap.getCode(hotKey.keyStroke, display);
         if (code == 0) {
-            logger.warning("Could not find mapping for " + hotKey.keyStroke);
+            LOGGER.warn("Could not find mapping for " + hotKey.keyStroke);
             return;
         }
         int modifiers = KeyMap.getModifiers(hotKey.keyStroke);
@@ -206,7 +209,7 @@ public class X11Provider extends Provider {
             Lib.XGetErrorText(display, errorEvent.error_code, buf, buf.length);
             int len = 0;
             while (buf[len] != 0) len++;
-            logger.warning("Error: " + new String(buf, 0, len));
+            LOGGER.warn("Error: " + new String(buf, 0, len));
             return 0;
         }
     }
