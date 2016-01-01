@@ -52,7 +52,7 @@ should include a slf4j binding to your classpath.
 
     <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>jul-to-slf4j</artifactId>
+        <artifactId>slf4j-jdk14</artifactId>
         <version>1.7.13</version>
     </dependency>
 

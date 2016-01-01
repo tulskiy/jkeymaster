@@ -37,7 +37,7 @@ import static com.tulskiy.keymaster.windows.User32.*;
  * Date: 6/12/11
  */
 public class WindowsProvider extends Provider {
-    private static final Logger LOGGER = LoggerFactory.getLogger(Provider.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WindowsProvider.class);
     private static volatile int idSeq = 0;
 
     private boolean listen;
