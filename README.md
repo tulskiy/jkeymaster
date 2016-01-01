@@ -44,6 +44,18 @@ Maven
         </repository>
     </repositories>
 
+Logging
+-------
+
+JKeyMaster uses [slf4j](https://github.com/qos-ch/slf4j) as the logging framework. To get output from the library you
+should include a slf4j binding to your classpath.
+
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>1.7.13</version>
+    </dependency>
+
 Testing
 -------
 
