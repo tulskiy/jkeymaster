@@ -21,7 +21,7 @@ import javax.swing.*;
 
 /**
  * Internal representation of a hotkey. Either keyStroke or mediaKey should be set.
- * <p/>
+ * <br>
  * Author: Denis Tulskiy
  * Date: 6/20/11
  */

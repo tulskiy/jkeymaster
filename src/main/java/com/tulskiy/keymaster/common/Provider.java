@@ -30,7 +30,7 @@ import java.util.concurrent.Executors;
 
 /**
  * Main interface to global hotkey providers
- * <p>
+ * <br>
  * Author: Denis Tulskiy
  * Date: 6/12/11
  */
@@ -76,7 +76,7 @@ public abstract class Provider {
 
     /**
      * Stop the provider. Stops main thread and frees any resources.
-     * </br>
+     * <br>
      * all hotkeys should be reset before calling this method
      *
      * @see Provider#reset()
@@ -102,7 +102,7 @@ public abstract class Provider {
 
     /**
      * Register a media hotkey. Currently supported media keys are:
-     * <p>
+     * <br>
      * <ul>
      * <li>Play/Pause</li>
      * <li>Stop</li>
