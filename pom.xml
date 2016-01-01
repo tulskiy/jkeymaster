@@ -7,7 +7,7 @@
     <description>Cross-platform Java provider for global hotkeys</description>
     <url>https://github.com/tulskiy/jkeymaster</url>
     <artifactId>jkeymaster</artifactId>
-    <version>1.2</version>
+    <version>1.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <licenses>
