@@ -17,23 +17,23 @@ You will need Java 1.6+ and Maven to build
 Maven
 -----
 
-    Release version:
+Release version:
     
     <dependencies>
         <dependency>
             <groupId>com.github.tulskiy</groupId>
             <artifactId>jkeymaster</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
     </dependencies>
     
-    Snapshot version:
+Snapshot version:
     
     <dependencies>
         <dependency>
             <groupId>com.github.tulskiy</groupId>
             <artifactId>jkeymaster</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>1.3-SNAPSHOT</version>
         </dependency>
     </dependencies>
     
@@ -61,7 +61,7 @@ Testing
 
 To test that the library works on your system, run the jar file
 
-    java -cp jkeymaster-1.1.jar com.tulskiy.keymaster.AWTTest
+    java -cp jkeymaster-1.2.jar com.tulskiy.keymaster.AWTTest
 
 It will open a simple window. At the top is a field that listens to key presses.
 Choose your hotkey and press `Grab` button. Check log output to see if it failed.
