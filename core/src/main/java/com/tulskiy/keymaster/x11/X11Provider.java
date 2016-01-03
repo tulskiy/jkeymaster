@@ -168,7 +168,7 @@ public class X11Provider extends Provider {
 
     @Override
     public void stop() {
-        if (thread != null) {
+        if (thread != null && thread.isAlive()) {
             listening = false;
             try {
                 thread.join();
@@ -194,11 +194,13 @@ public class X11Provider extends Provider {
 
     public void reset() {
         synchronized (lock) {
-            reset = true;
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if (thread.isAlive()) {
+                reset = true;
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
