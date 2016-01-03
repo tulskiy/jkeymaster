@@ -39,7 +39,14 @@ public class AWTTest {
         final JFrame frame = new JFrame();
         final Provider provider = Provider.getCurrentProvider(true);
 
+        if (provider == null) {
+            System.exit(1);
+        }
+
+        frame.add(new JLabel("Press hotkey combination:"), BorderLayout.NORTH);
+
         final JTextField textField = new JTextField();
+        textField.setFont(textField.getFont().deriveFont(Font.BOLD, 15f));
         textField.setEditable(false);
         textField.addKeyListener(new KeyAdapter() {
             @Override
@@ -51,7 +58,7 @@ public class AWTTest {
             }
         });
         frame.add(textField, BorderLayout.CENTER);
-        JPanel box = new JPanel(new GridLayout(2, 1));
+        JPanel box = new JPanel();
         JButton grab = new JButton("Grab");
         box.add(grab);
         final HotKeyListener listener = new HotKeyListener() {
@@ -78,8 +85,8 @@ public class AWTTest {
                 provider.register(MediaKey.MEDIA_STOP, listener);
             }
         });
-        box.add(grabMedia);
 
+        box.add(grabMedia);
 
         frame.add(box, BorderLayout.PAGE_END);
 
@@ -92,7 +99,7 @@ public class AWTTest {
             }
         });
 
-        frame.setSize(300, 150);
+        frame.setSize(500, 150);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }

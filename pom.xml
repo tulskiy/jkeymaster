@@ -3,12 +3,27 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.tulskiy</groupId>
-    <name>JKeyMaster</name>
+    <name>jkeymaster</name>
     <description>Cross-platform Java provider for global hotkeys</description>
     <url>https://github.com/tulskiy/jkeymaster</url>
-    <artifactId>jkeymaster</artifactId>
+
+    <modules>
+        <module>core</module>
+    </modules>
+
+    <artifactId>jkeymaster-parent</artifactId>
     <version>1.3-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+
+    <profiles>
+        <profile>
+            <id>gnome</id>
+            <modules>
+                <module>core</module>
+                <module>dbus</module>
+            </modules>
+        </profile>
+    </profiles>
 
     <licenses>
         <license>
@@ -39,6 +54,13 @@
         </developer>
     </developers>
 
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -50,31 +72,53 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.3</version>
+                <extensions>true</extensions>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.tulskiy.keymaster.AWTTest</mainClass>
-                            <addClasspath>true</addClasspath>
-                        </manifest>
-                    </archive>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>2.2.1</version>
                 <executions>
                     <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
+                        <id>attach-sources</id>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
-                        <configuration>
-                            <includeScope>runtime</includeScope>
-                            <outputDirectory>${project.build.directory}</outputDirectory>
-                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
@@ -82,11 +126,6 @@
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>4.2.1</version>
-        </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -96,8 +135,10 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-jdk14</artifactId>
             <version>1.7.13</version>
-            <scope>test</scope>
+            <scope>runtime</scope>
+            <optional>true</optional>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -105,10 +146,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>7</version>
-    </parent>
 </project>
