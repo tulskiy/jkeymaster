@@ -12,7 +12,21 @@ Building
 
 You will need Java 1.6+ and Maven to build
 
-    mvn clean package
+    mvn clean install
+    
+for jkeymaster-dbus, you will need to download and build a few dependencies
+
+    git clone git@github.com:tulskiy/libmatthew-java.git
+    cd libmatthew-java
+    mvn clean install
+
+    git clone git@github.com:tulskiy/dbus-java.git
+    cd dbus-java
+    mvn clean install -DskipTests
+    
+then you can build from project root with profile `linux`
+    
+    mvn -P linux clean install 
 
 Maven
 -----
@@ -97,6 +111,23 @@ When you're done using the library, you need to reset hotkeys and stop the provi
 
     provider.reset();
     provider.stop();
+    
+DBus
+----
+
+On some systems DBus does not allow registering hotkeys for media keys. To fix this, you can use
+`GnomeMediaProvider` class. Just create new instance and register media hotkeys with it. It implements same api as
+other providers
+
+    final GnomeMediaProvider provider = new GnomeMediaProvider("test");
+    provider.register(MediaKey.MEDIA_STOP, new HotKeyListener() {...});
+    
+however, this requires extra native libraries. You will need to have your users install
+
+    # apt-get install libunixsocket-java
+     
+then, if you get UnsatisfiedLinkError, you will need to find where libunix-java.so is located and add this path as 
+`-Djava.library.path=$YOUR_PATH`. It's usually /usr/lib/jni or /usr/local/lib/jni
     
 Clojure
 -------

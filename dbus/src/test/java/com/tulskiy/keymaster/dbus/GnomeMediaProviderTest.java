@@ -21,5 +21,6 @@ public class GnomeMediaProviderTest {
         });
 
         Thread.sleep(10000);
+        provider.stop();
     }
 }

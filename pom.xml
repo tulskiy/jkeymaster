@@ -17,7 +17,7 @@
 
     <profiles>
         <profile>
-            <id>gnome</id>
+            <id>linux</id>
             <modules>
                 <module>core</module>
                 <module>dbus</module>
