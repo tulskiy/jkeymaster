@@ -85,6 +85,9 @@ popup a message.
 There's also a `Grab media keys` button that should register media keys
 (only Windows and Linux) - Play/Pause, Next Track, Previous Track, Stop.
 
+If you get UnsatisfiedLinkError on linux, it is probable that you have an older jna version installed, see [#19](https://github.com/tulskiy/jkeymaster/issues/19)
+you will need to either remove libjna-java from your system, or add `-Djna.nosys=true` to jvm args
+
 API Example
 -----------
 
