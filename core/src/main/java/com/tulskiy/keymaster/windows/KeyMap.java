@@ -26,8 +26,6 @@ import java.util.Map;
 
 import static com.tulskiy.keymaster.windows.User32.*;
 import static java.awt.event.KeyEvent.*;
-import static java.awt.event.KeyEvent.VK_SEMICOLON;
-import static java.awt.event.KeyEvent.VK_SLASH;
 
 /**
  * Author: Denis Tulskiy
@@ -91,11 +89,17 @@ public class KeyMap {
             if ((keyCode.getModifiers() & InputEvent.ALT_DOWN_MASK) != 0) {
                 modifiers |= MOD_ALT;
             }
+            if (keyCode.isOnKeyRelease()) {
+                modifiers |= MOD_KEYUP;
+            }
         }
 
-        if (System.getProperty("os.name", "").startsWith("Windows 7")) {
+        String os = System.getProperty("os.version", "");
+        // MOD_NOREPEAT only supported starting with Windows 7
+        if (os.compareTo("6.1") >= 0) {
             modifiers |= MOD_NOREPEAT;
         }
+
         return modifiers;
     }
 }
