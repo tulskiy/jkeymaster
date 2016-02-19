@@ -17,6 +17,7 @@
 
 package com.tulskiy.keymaster.x11;
 
+import com.sun.jna.Memory;
 import com.sun.jna.NativeLong;
 import com.sun.jna.Pointer;
 import com.tulskiy.keymaster.common.HotKey;
@@ -61,19 +62,17 @@ public class X11Provider extends Provider {
                 listening = true;
                 XEvent event = new XEvent();
 
+                Memory supported_rtrn = new Memory(Pointer.SIZE);
+                Lib.XkbSetDetectableAutoRepeat(display, true, supported_rtrn);
+                if (supported_rtrn.getInt(0) != 1) {
+                    LOGGER.warn("auto repeat detection not supported");
+                }
+
                 while (listening) {
                     while (Lib.XPending(display) > 0) {
                         Lib.XNextEvent(display, event);
-                        if (event.type == KeyPress) {
-                            XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
-                            for (X11HotKey hotKey : hotKeys) {
-                                int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
-                                if (hotKey.code == (byte) xkey.keycode && hotKey.modifiers == state) {
-                                    LOGGER.info("Received event for hotkey: " + hotKey);
-                                    fireEvent(hotKey);
-                                    break;
-                                }
-                            }
+                        if (event.type == KeyPress || event.type == KeyRelease) {
+                            processEvent(event);
                         }
                     }
 
@@ -106,6 +105,22 @@ public class X11Provider extends Provider {
                 }
 
                 LOGGER.info("Thread - stop listening");
+            }
+
+            private void processEvent(XEvent event) {
+                XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
+                for (X11HotKey hotKey : hotKeys) {
+                    int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
+                    int eventType = hotKey.keyStroke.isOnKeyRelease() ? KeyRelease : KeyPress;
+
+                    if (hotKey.code == (byte) xkey.keycode
+                            && hotKey.modifiers == state
+                            && event.type == eventType) {
+                        LOGGER.info("Received event for hotkey: " + hotKey);
+                        fireEvent(hotKey);
+                        break;
+                    }
+                }
             }
         };
 

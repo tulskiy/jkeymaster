@@ -31,7 +31,7 @@ public class ProviderTest {
     public static void main(String[] args) {
         final Provider provider = Provider.getCurrentProvider(false);
 
-        provider.register(KeyStroke.getKeyStroke("control alt D"), new HotKeyListener() {
+        provider.register(KeyStroke.getKeyStroke("control alt F"), new HotKeyListener() {
             public void onHotKey(HotKey hotKey) {
                 System.out.println(hotKey);
                 provider.reset();
@@ -44,28 +44,7 @@ public class ProviderTest {
                 System.out.println(hotKey);
             }
         };
-        provider.register(KeyStroke.getKeyStroke("control shift 0"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift PLUS"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift INSERT"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift ESCAPE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift BACK_QUOTE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift SLASH"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift BACK_SLASH"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift DIVIDE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift MULTIPLY"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift ENTER"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift MINUS"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift BACK_QUOTE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift UP"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift INSERT"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift DELETE"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift ADD"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift SUBTRACT"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift COMMA"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift PERIOD"), listener);
-        provider.register(KeyStroke.getKeyStroke("control shift SEMICOLON"), listener);
-        provider.register(KeyStroke.getKeyStroke("control alt HOME"), listener);
-        provider.register(KeyStroke.getKeyStroke("control alt PAGE_UP"), listener);
-        provider.register(KeyStroke.getKeyStroke("control alt NUMPAD0"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift 1"), listener);
+        provider.register(KeyStroke.getKeyStroke("control shift released 1"), listener);
     }
 }

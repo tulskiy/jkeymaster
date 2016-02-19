@@ -32,6 +32,7 @@ public interface X11 extends Library {
 
     public static final int GrabModeAsync = 1;
     public static final int KeyPress = 2;
+    public static final int KeyRelease = 3;
 
     public static final int ShiftMask = (1);
     public static final int LockMask = (1 << 1);
@@ -57,6 +58,8 @@ public interface X11 extends Library {
     public int XPending(Pointer display);
 
     public int XCloseDisplay(Pointer display);
+
+    public int XkbSetDetectableAutoRepeat(Pointer display, boolean detectable, Pointer supported_rtrn);
 
     public XErrorHandler XSetErrorHandler(XErrorHandler errorHandler);
 
