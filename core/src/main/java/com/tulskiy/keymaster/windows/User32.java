@@ -37,7 +37,6 @@ public class User32 {
     public static final int MOD_NOREPEAT = 0x4000;
     public static final int MOD_SHIFT = 0x0004;
     public static final int MOD_WIN = 0x0008;
-    public static final int MOD_KEYUP = 0x1000;
     public static final int WM_HOTKEY = 0x0312;
     public static final int VK_MEDIA_NEXT_TRACK = 0xB0;
     public static final int VK_MEDIA_PREV_TRACK = 0xB1;

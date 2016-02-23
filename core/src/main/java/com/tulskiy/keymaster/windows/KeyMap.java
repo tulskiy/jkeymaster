@@ -89,9 +89,6 @@ public class KeyMap {
             if ((keyCode.getModifiers() & InputEvent.ALT_DOWN_MASK) != 0) {
                 modifiers |= MOD_ALT;
             }
-            if (keyCode.isOnKeyRelease()) {
-                modifiers |= MOD_KEYUP;
-            }
         }
 
         String os = System.getProperty("os.version", "");
