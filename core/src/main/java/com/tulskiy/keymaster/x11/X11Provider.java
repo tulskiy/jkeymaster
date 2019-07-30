@@ -17,6 +17,8 @@
 
 package com.tulskiy.keymaster.x11;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Native;
 import com.sun.jna.platform.unix.X11;
 import com.sun.jna.platform.unix.X11.Display;
 import com.sun.jna.platform.unix.X11.Window;
@@ -24,7 +26,6 @@ import com.sun.jna.platform.unix.X11.XErrorEvent;
 import com.sun.jna.platform.unix.X11.XErrorHandler;
 import com.sun.jna.platform.unix.X11.XEvent;
 import com.sun.jna.platform.unix.X11.XKeyEvent;
-import com.sun.jna.ptr.PointerByReference;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
@@ -32,11 +33,12 @@ import com.tulskiy.keymaster.common.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import javax.swing.KeyStroke;
 
 /**
  * Author: Denis Tulskiy
@@ -65,9 +67,9 @@ public class X11Provider extends Provider {
                 listening = true;
                 XEvent event = new XEvent();
 
-                PointerByReference supported_rtrn = new PointerByReference();
+                Memory supported_rtrn = new Memory(Native.POINTER_SIZE);
                 X11Ext.Lib.XkbSetDetectableAutoRepeat(display, true, supported_rtrn);
-                if (supported_rtrn.getValue().getInt(0) != 1) {
+                if (supported_rtrn.getInt(0) != 1) {
                     LOGGER.warn("auto repeat detection not supported");
                 }
 

@@ -1,0 +1,9 @@
+language: java
+jdk:
+  - openjdk11
+before_install:
+  - sudo apt-get -y install libc6-i386 xvfb
+  - export DISPLAY=':99.0'
+  - Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+install: true
+script: mvn -q -V -B clean install -pl core
