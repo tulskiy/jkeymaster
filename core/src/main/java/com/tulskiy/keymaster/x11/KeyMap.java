@@ -17,7 +17,9 @@
 
 package com.tulskiy.keymaster.x11;
 
-import com.sun.jna.Pointer;
+import com.sun.jna.platform.unix.X11;
+import com.sun.jna.platform.unix.X11.Display;
+import com.sun.jna.platform.unix.X11.KeySym;
 import com.tulskiy.keymaster.common.MediaKey;
 
 import javax.swing.*;
@@ -25,7 +27,7 @@ import java.awt.event.InputEvent;
 import java.util.HashMap;
 
 import static com.tulskiy.keymaster.x11.KeySymDef.*;
-import static com.tulskiy.keymaster.x11.X11.*;
+import static com.tulskiy.keymaster.x11.X11Ext.*;
 import static java.awt.event.KeyEvent.*;
 
 /**
@@ -94,7 +96,7 @@ public class KeyMap {
         put(XF86XK_AudioStop, XF86XK_AudioStop);
     }};
 
-    public static byte getCode(KeyStroke keyStroke, Pointer display) {
+    public static byte getCode(KeyStroke keyStroke, Display display) {
         int code = keyStroke.getKeyCode();
 
         int ret = -1;
@@ -112,13 +114,13 @@ public class KeyMap {
         }
 
         if (ret != -1) {
-            return Lib.XKeysymToKeycode(display, ret);
+            return X11.INSTANCE.XKeysymToKeycode(display, new KeySym(ret));
         } else {
             return 0;
         }
     }
 
-    public static byte getMediaCode(MediaKey mediaKey, Pointer display) {
+    public static byte getMediaCode(MediaKey mediaKey, Display display) {
         int code = 0;
         switch (mediaKey) {
             case MEDIA_NEXT_TRACK:
@@ -134,22 +136,22 @@ public class KeyMap {
                 code = XF86XK_AudioStop;
                 break;
         }
-        return Lib.XKeysymToKeycode(display, code);
+        return X11.INSTANCE.XKeysymToKeycode(display, new KeySym(code));
     }
 
     public static int getModifiers(KeyStroke keyCode) {
         int modifiers = 0;
         if ((keyCode.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0) {
-            modifiers |= ShiftMask;
+            modifiers |= X11.ShiftMask;
         }
         if ((keyCode.getModifiers() & InputEvent.CTRL_DOWN_MASK) != 0) {
-            modifiers |= ControlMask;
+            modifiers |= X11.ControlMask;
         }
         if ((keyCode.getModifiers() & InputEvent.META_DOWN_MASK) != 0) {
-            modifiers |= Mod4Mask;
+            modifiers |= X11.Mod4Mask;
         }
         if ((keyCode.getModifiers() & InputEvent.ALT_DOWN_MASK) != 0) {
-            modifiers |= Mod1Mask;
+            modifiers |= X11.Mod1Mask;
         }
         return modifiers;
     }
