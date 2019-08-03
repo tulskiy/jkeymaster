@@ -17,6 +17,8 @@
 
 package com.tulskiy.keymaster.windows;
 
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinUser;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
@@ -29,8 +31,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-
-import static com.tulskiy.keymaster.windows.User32.*;
 
 /**
  * Author: Denis Tulskiy
@@ -52,11 +52,11 @@ public class WindowsProvider extends Provider {
         Runnable runnable = new Runnable() {
             public void run() {
                 LOGGER.info("Starting Windows global hotkey provider");
-                MSG msg = new MSG();
+                WinUser.MSG msg = new WinUser.MSG();
                 listen = true;
                 while (listen) {
-                    while (PeekMessage(msg, null, 0, 0, PM_REMOVE)) {
-                        if (msg.message == WM_HOTKEY) {
+                    while (User32.INSTANCE.PeekMessage(msg, null, 0, 0, 1)) {
+                        if (msg.message == WinUser.WM_HOTKEY) {
                             int id = msg.wParam.intValue();
                             HotKey hotKey = hotKeys.get(id);
 
@@ -70,7 +70,7 @@ public class WindowsProvider extends Provider {
                         if (reset) {
                             LOGGER.info("Reset hotkeys");
                             for (Integer id : hotKeys.keySet()) {
-                                UnregisterHotKey(null, id);
+                                User32.INSTANCE.UnregisterHotKey(null, id);
                             }
 
                             hotKeys.clear();
@@ -99,7 +99,7 @@ public class WindowsProvider extends Provider {
     private void register(HotKey hotKey) {
         int id = idSeq++;
         int code = KeyMap.getCode(hotKey);
-        if (RegisterHotKey(null, id, KeyMap.getModifiers(hotKey.keyStroke), code)) {
+        if (User32.INSTANCE.RegisterHotKey(null, id, KeyMap.getModifiers(hotKey.keyStroke), code)) {
             LOGGER.info("Registering hotkey: " + hotKey);
             hotKeys.put(id, hotKey);
         } else {

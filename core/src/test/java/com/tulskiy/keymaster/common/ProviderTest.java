@@ -1,25 +1,28 @@
 package com.tulskiy.keymaster.common;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.AWTException;
+import java.awt.Robot;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 /**
- * Ignored test because it's success depeneds on current system setup
+ * Some shortcuts might not be available on every system. Maybe use xvfb or similar in such cases.
  *
  * Author: Denis Tulskiy
  * Date: 7/25/11
  */
-@Ignore
 public class ProviderTest {
     private Robot robot;
     private final Object lock = new Object();

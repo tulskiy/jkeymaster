@@ -1,5 +1,6 @@
 JKeyMaster
 ==========
+[![Build Status](https://travis-ci.org/jjYBdx4IL/jkeymaster.png?branch=master)](https://travis-ci.org/jjYBdx4IL/jkeymaster)
 
 This is a java library that provides single interface to register Global Hotkeys for several platforms:
 

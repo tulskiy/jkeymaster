@@ -18,8 +18,14 @@
 package com.tulskiy.keymaster.x11;
 
 import com.sun.jna.Memory;
-import com.sun.jna.NativeLong;
-import com.sun.jna.Pointer;
+import com.sun.jna.Native;
+import com.sun.jna.platform.unix.X11;
+import com.sun.jna.platform.unix.X11.Display;
+import com.sun.jna.platform.unix.X11.Window;
+import com.sun.jna.platform.unix.X11.XErrorEvent;
+import com.sun.jna.platform.unix.X11.XErrorHandler;
+import com.sun.jna.platform.unix.X11.XEvent;
+import com.sun.jna.platform.unix.X11.XKeyEvent;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
@@ -27,13 +33,12 @@ import com.tulskiy.keymaster.common.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import static com.tulskiy.keymaster.x11.X11.*;
+import javax.swing.KeyStroke;
 
 /**
  * Author: Denis Tulskiy
@@ -41,8 +46,8 @@ import static com.tulskiy.keymaster.x11.X11.*;
  */
 public class X11Provider extends Provider {
     private static final Logger LOGGER = LoggerFactory.getLogger(X11Provider.class);
-    private Pointer display;
-    private NativeLong window;
+    private Display display;
+    private Window window;
     private boolean listening;
     private Thread thread;
     private boolean reset;
@@ -55,23 +60,23 @@ public class X11Provider extends Provider {
         Runnable runnable = new Runnable() {
             public void run() {
                 LOGGER.info("Starting X11 global hotkey provider");
-                display = Lib.XOpenDisplay(null);
+                display = X11.INSTANCE.XOpenDisplay(null);
                 errorHandler = new ErrorHandler();
-                Lib.XSetErrorHandler(errorHandler);
-                window = Lib.XDefaultRootWindow(display);
+                X11.INSTANCE.XSetErrorHandler((XErrorHandler) errorHandler);
+                window = X11.INSTANCE.XDefaultRootWindow(display);
                 listening = true;
                 XEvent event = new XEvent();
 
-                Memory supported_rtrn = new Memory(Pointer.SIZE);
-                Lib.XkbSetDetectableAutoRepeat(display, true, supported_rtrn);
+                Memory supported_rtrn = new Memory(Native.POINTER_SIZE);
+                X11Ext.Lib.XkbSetDetectableAutoRepeat(display, true, supported_rtrn);
                 if (supported_rtrn.getInt(0) != 1) {
                     LOGGER.warn("auto repeat detection not supported");
                 }
 
                 while (listening) {
-                    while (Lib.XPending(display) > 0) {
-                        Lib.XNextEvent(display, event);
-                        if (event.type == KeyPress || event.type == KeyRelease) {
+                    while (X11.INSTANCE.XPending(display) > 0) {
+                        X11.INSTANCE.XNextEvent(display, event);
+                        if (event.type == X11.KeyPress || event.type == X11.KeyRelease) {
                             processEvent(event);
                         }
                     }
@@ -110,8 +115,8 @@ public class X11Provider extends Provider {
             private void processEvent(XEvent event) {
                 XKeyEvent xkey = (XKeyEvent) event.readField("xkey");
                 for (X11HotKey hotKey : hotKeys) {
-                    int state = xkey.state & (ShiftMask | ControlMask | Mod1Mask | Mod4Mask);
-                    int eventType = hotKey.keyStroke.isOnKeyRelease() ? KeyRelease : KeyPress;
+                    int state = xkey.state & (X11.ShiftMask | X11.ControlMask | X11.Mod1Mask | X11.Mod4Mask);
+                    int eventType = hotKey.keyStroke.isOnKeyRelease() ? X11.KeyRelease : X11.KeyPress;
 
                     if (hotKey.code == (byte) xkey.keycode
                             && hotKey.modifiers == state
@@ -140,7 +145,7 @@ public class X11Provider extends Provider {
         for (int i = 0; i < 16; i++) {
             int flags = correctModifiers(modifiers, i);
 
-            Lib.XGrabKey(display, code, flags, window, 1, GrabModeAsync, GrabModeAsync);
+            X11.INSTANCE.XGrabKey(display, code, flags, window, 1, X11.GrabModeAsync, X11.GrabModeAsync);
         }
     }
 
@@ -148,7 +153,7 @@ public class X11Provider extends Provider {
         byte keyCode = KeyMap.getMediaCode(hotKey.mediaKey, display);
         hotKey.modifiers = 0;
         hotKey.code = keyCode;
-        Lib.XGrabKey(display, keyCode, 0, window, 1, GrabModeAsync, GrabModeAsync);
+        X11.INSTANCE.XGrabKey(display, keyCode, 0, window, 1, X11.GrabModeAsync, X11.GrabModeAsync);
     }
 
     private void resetAll() {
@@ -158,10 +163,10 @@ public class X11Provider extends Provider {
                 for (int i = 0; i < 16; i++) {
                     int flags = correctModifiers(modifiers, i);
 
-                    Lib.XUngrabKey(display, hotKey.code, flags, window);
+                    X11.INSTANCE.XUngrabKey(display, hotKey.code, flags, window);
                 }
             } else {
-                Lib.XUngrabKey(display, hotKey.code, 0, window);
+                X11.INSTANCE.XUngrabKey(display, hotKey.code, 0, window);
             }
         }
 
@@ -171,13 +176,13 @@ public class X11Provider extends Provider {
     private int correctModifiers(int modifiers, int flags) {
         int ret = modifiers;
         if ((flags & 1) != 0)
-            ret |= LockMask;
+            ret |= X11.LockMask;
         if ((flags & 2) != 0)
-            ret |= Mod2Mask;
+            ret |= X11.Mod2Mask;
         if ((flags & 4) != 0)
-            ret |= Mod3Mask;
+            ret |= X11.Mod3Mask;
         if ((flags & 8) != 0)
-            ret |= Mod5Mask;
+            ret |= X11.Mod5Mask;
         return ret;
     }
 
@@ -187,7 +192,7 @@ public class X11Provider extends Provider {
             listening = false;
             try {
                 thread.join();
-                Lib.XCloseDisplay(display);
+                X11.INSTANCE.XCloseDisplay(display);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -221,9 +226,9 @@ public class X11Provider extends Provider {
     }
 
     class ErrorHandler implements XErrorHandler {
-        public int apply(Pointer display, XErrorEvent errorEvent) {
+        public int apply(Display display, XErrorEvent errorEvent) {
             byte[] buf = new byte[1024];
-            Lib.XGetErrorText(display, errorEvent.error_code, buf, buf.length);
+            X11.INSTANCE.XGetErrorText(display, errorEvent.error_code, buf, buf.length);
             int len = 0;
             while (buf[len] != 0) len++;
             LOGGER.warn("Error: " + new String(buf, 0, len));

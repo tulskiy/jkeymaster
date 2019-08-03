@@ -17,15 +17,26 @@
 
 package com.tulskiy.keymaster.windows;
 
+import static java.awt.event.KeyEvent.VK_COMMA;
+import static java.awt.event.KeyEvent.VK_DELETE;
+import static java.awt.event.KeyEvent.VK_ENTER;
+import static java.awt.event.KeyEvent.VK_INSERT;
+import static java.awt.event.KeyEvent.VK_MINUS;
+import static java.awt.event.KeyEvent.VK_PERIOD;
+import static java.awt.event.KeyEvent.VK_PLUS;
+import static java.awt.event.KeyEvent.VK_PRINTSCREEN;
+import static java.awt.event.KeyEvent.VK_SEMICOLON;
+import static java.awt.event.KeyEvent.VK_SLASH;
+
+import com.sun.jna.platform.win32.Win32VK;
+import com.sun.jna.platform.win32.WinUser;
 import com.tulskiy.keymaster.common.HotKey;
 
-import javax.swing.*;
 import java.awt.event.InputEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tulskiy.keymaster.windows.User32.*;
-import static java.awt.event.KeyEvent.*;
+import javax.swing.KeyStroke;
 
 /**
  * Author: Denis Tulskiy
@@ -50,16 +61,16 @@ public class KeyMap {
             int code = 0;
             switch (hotKey.mediaKey) {
                 case MEDIA_NEXT_TRACK:
-                    code = VK_MEDIA_NEXT_TRACK;
+                    code = Win32VK.VK_MEDIA_NEXT_TRACK.code;
                     break;
                 case MEDIA_PLAY_PAUSE:
-                    code = VK_MEDIA_PLAY_PAUSE;
+                    code = Win32VK.VK_MEDIA_PLAY_PAUSE.code;
                     break;
                 case MEDIA_PREV_TRACK:
-                    code = VK_MEDIA_PREV_TRACK;
+                    code = Win32VK.VK_MEDIA_PREV_TRACK.code;
                     break;
                 case MEDIA_STOP:
-                    code = VK_MEDIA_STOP;
+                    code = Win32VK.VK_MEDIA_STOP.code;
                     break;
             }
 
@@ -78,23 +89,23 @@ public class KeyMap {
         int modifiers = 0;
         if (keyCode != null) {
             if ((keyCode.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0) {
-                modifiers |= MOD_SHIFT;
+                modifiers |= WinUser.MOD_SHIFT;
             }
             if ((keyCode.getModifiers() & InputEvent.CTRL_DOWN_MASK) != 0) {
-                modifiers |= MOD_CONTROL;
+                modifiers |= WinUser.MOD_CONTROL;
             }
             if ((keyCode.getModifiers() & InputEvent.META_DOWN_MASK) != 0) {
-                modifiers |= MOD_WIN;
+                modifiers |= WinUser.MOD_WIN;
             }
             if ((keyCode.getModifiers() & InputEvent.ALT_DOWN_MASK) != 0) {
-                modifiers |= MOD_ALT;
+                modifiers |= WinUser.MOD_ALT;
             }
         }
 
         String os = System.getProperty("os.version", "");
         // MOD_NOREPEAT only supported starting with Windows 7
         if (os.compareTo("6.1") >= 0) {
-            modifiers |= MOD_NOREPEAT;
+            modifiers |= WinUser.MOD_NOREPEAT;
         }
 
         return modifiers;
