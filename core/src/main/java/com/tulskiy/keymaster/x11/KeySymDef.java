@@ -21,7 +21,7 @@ package com.tulskiy.keymaster.x11;
  * Author: Denis Tulskiy
  * Date: 6/13/11
  */
-public class KeySymDef {
+class KeySymDef {
     public static final int XK_F1 = 0xffbe;
     public static final int XK_F2 = 0xffbf;
     public static final int XK_F3 = 0xffc0;

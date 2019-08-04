@@ -17,8 +17,6 @@
 
 package com.tulskiy.keymaster.x11;
 
-import com.sun.jna.Memory;
-import com.sun.jna.Native;
 import com.sun.jna.platform.unix.X11;
 import com.sun.jna.platform.unix.X11.Display;
 import com.sun.jna.platform.unix.X11.Window;
@@ -26,6 +24,7 @@ import com.sun.jna.platform.unix.X11.XErrorEvent;
 import com.sun.jna.platform.unix.X11.XErrorHandler;
 import com.sun.jna.platform.unix.X11.XEvent;
 import com.sun.jna.platform.unix.X11.XKeyEvent;
+import com.sun.jna.ptr.IntByReference;
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
@@ -62,14 +61,14 @@ public class X11Provider extends Provider {
                 LOGGER.info("Starting X11 global hotkey provider");
                 display = X11.INSTANCE.XOpenDisplay(null);
                 errorHandler = new ErrorHandler();
-                X11.INSTANCE.XSetErrorHandler((XErrorHandler) errorHandler);
+                X11.INSTANCE.XSetErrorHandler(errorHandler);
                 window = X11.INSTANCE.XDefaultRootWindow(display);
                 listening = true;
                 XEvent event = new XEvent();
 
-                Memory supported_rtrn = new Memory(Native.POINTER_SIZE);
+                IntByReference supported_rtrn = new IntByReference();
                 X11Ext.Lib.XkbSetDetectableAutoRepeat(display, true, supported_rtrn);
-                if (supported_rtrn.getInt(0) != 1) {
+                if (supported_rtrn.getValue() != 1) {
                     LOGGER.warn("auto repeat detection not supported");
                 }
 

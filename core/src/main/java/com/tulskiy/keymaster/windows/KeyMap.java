@@ -42,7 +42,7 @@ import javax.swing.KeyStroke;
  * Author: Denis Tulskiy
  * Date: 6/20/11
  */
-public class KeyMap {
+class KeyMap {
     private static final Map<Integer, Integer> codeExceptions = new HashMap<Integer, Integer>() {{
         put(VK_INSERT, 0x2D);
         put(VK_DELETE, 0x2E);
@@ -56,7 +56,7 @@ public class KeyMap {
         put(VK_PRINTSCREEN, 0x2C);
     }};
 
-    public static int getCode(HotKey hotKey) {
+    static int getCode(HotKey hotKey) {
         if (hotKey.isMedia()) {
             int code = 0;
             switch (hotKey.mediaKey) {
@@ -85,7 +85,7 @@ public class KeyMap {
         }
     }
 
-    public static int getModifiers(KeyStroke keyCode) {
+    static int getModifiers(KeyStroke keyCode) {
         int modifiers = 0;
         if (keyCode != null) {
             if ((keyCode.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0) {

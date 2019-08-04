@@ -27,14 +27,13 @@ import java.awt.event.InputEvent;
 import java.util.HashMap;
 
 import static com.tulskiy.keymaster.x11.KeySymDef.*;
-import static com.tulskiy.keymaster.x11.X11Ext.*;
 import static java.awt.event.KeyEvent.*;
 
 /**
  * Author: Denis Tulskiy
  * Date: 6/13/11
  */
-public class KeyMap {
+class KeyMap {
     private static final HashMap<Integer, Integer> common = new HashMap<Integer, Integer>() {{
         put(VK_ESCAPE, XK_Escape);
         put(VK_BACK_SPACE, XK_BackSpace);
@@ -96,7 +95,7 @@ public class KeyMap {
         put(XF86XK_AudioStop, XF86XK_AudioStop);
     }};
 
-    public static byte getCode(KeyStroke keyStroke, Display display) {
+    static byte getCode(KeyStroke keyStroke, Display display) {
         int code = keyStroke.getKeyCode();
 
         int ret = -1;
@@ -120,7 +119,7 @@ public class KeyMap {
         }
     }
 
-    public static byte getMediaCode(MediaKey mediaKey, Display display) {
+    static byte getMediaCode(MediaKey mediaKey, Display display) {
         int code = 0;
         switch (mediaKey) {
             case MEDIA_NEXT_TRACK:
@@ -139,7 +138,7 @@ public class KeyMap {
         return X11.INSTANCE.XKeysymToKeycode(display, new KeySym(code));
     }
 
-    public static int getModifiers(KeyStroke keyCode) {
+    static int getModifiers(KeyStroke keyCode) {
         int modifiers = 0;
         if ((keyCode.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0) {
             modifiers |= X11.ShiftMask;

@@ -18,18 +18,16 @@
 package com.tulskiy.keymaster.x11;
 
 import com.sun.jna.Library;
-import com.sun.jna.Memory;
 import com.sun.jna.Native;
 import com.sun.jna.platform.unix.X11.Display;
+import com.sun.jna.ptr.IntByReference;
 
 /**
  * Author: Denis Tulskiy
  * Date: 7/14/11
  */
-@SuppressWarnings({"UnusedDeclaration"})
-public interface X11Ext extends Library {
-    public static X11Ext Lib = (X11Ext) Native.loadLibrary("X11", X11Ext.class);
+interface X11Ext extends Library {
+    X11Ext Lib = (X11Ext) Native.load("X11", X11Ext.class);
 
-    public int XkbSetDetectableAutoRepeat(Display display, boolean detectable, Memory supported_rtrn);
-
+    void XkbSetDetectableAutoRepeat(Display display, boolean detectable, IntByReference supported_rtrn);
 }
