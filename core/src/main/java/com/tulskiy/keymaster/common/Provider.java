@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import java.io.Closeable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -34,7 +35,7 @@ import java.util.concurrent.Executors;
  * Author: Denis Tulskiy
  * Date: 6/12/11
  */
-public abstract class Provider {
+public abstract class Provider implements Closeable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Provider.class);
 
     static {
@@ -94,6 +95,14 @@ public abstract class Provider {
      * Reset all hotkey listeners
      */
     public abstract void reset();
+
+    /**
+     * Frees all resources by stopping the provider after resetting all hotkey listeners.
+     */
+    public void close() {
+        reset();
+        stop();
+    }
 
     /**
      * Register a global hotkey. Only keyCode and modifiers fields are respected
