@@ -49,9 +49,9 @@
             <version>${parent.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.freedesktop.dbus</groupId>
+            <groupId>com.github.hypfvieh</groupId>
             <artifactId>dbus-java</artifactId>
-            <version>2.7</version>
+            <version>2.7.5</version>
         </dependency>
     </dependencies>
 </project>
