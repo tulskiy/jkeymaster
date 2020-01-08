@@ -71,6 +71,16 @@ public class GnomeMediaProvider extends Provider {
         listeners.put(mediaKey, listener);
     }
 
+    @Override
+    public void unregister(KeyStroke keyCode) {
+        throw new UnsupportedOperationException("only media keys are supported");
+    }
+
+    @Override
+    public void unregister(MediaKey mediaKey) {
+        listeners.remove(mediaKey);
+    }
+
     private void fire(MediaKey key) {
         HotKeyListener listener = listeners.get(key);
         if (listener != null) {
