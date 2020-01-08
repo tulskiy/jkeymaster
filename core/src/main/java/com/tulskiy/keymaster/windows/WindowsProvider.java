@@ -79,7 +79,12 @@ public class WindowsProvider extends Provider {
                         }
 
                         while (!registerQueue.isEmpty()) {
-                            register(registerQueue.poll());
+                            HotKey hotKey = registerQueue.poll();
+                            if (hotKey.isUnregister()) {
+                                unregister(hotKey);
+                            } else {
+                                register(hotKey);
+                            }
                         }
                         try {
                             lock.wait(300);
@@ -116,6 +121,30 @@ public class WindowsProvider extends Provider {
     public void register(MediaKey mediaKey, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new HotKey(mediaKey, listener));
+        }
+    }
+
+    private void unregister(HotKey hotKey) {
+        hotKeys.entrySet().removeIf(regHotKey -> {
+            boolean matches = hotKey.hasSameTrigger(regHotKey.getValue());
+            if (matches) {
+                if (!User32.INSTANCE.UnregisterHotKey(null, regHotKey.getKey())) {
+                    LOGGER.warn("Could not unregister hotkey: " + hotKey);
+                }
+            }
+            return matches;
+        });
+    }
+
+    public void unregister(KeyStroke keyCode) {
+        synchronized (lock) {
+            registerQueue.add(new HotKey(keyCode, null));
+        }
+    }
+
+    public void unregister(MediaKey mediaKey) {
+        synchronized (lock) {
+            registerQueue.add(new HotKey(mediaKey, null));
         }
     }
 

@@ -130,6 +130,29 @@ public abstract class Provider implements Closeable {
     public abstract void register(MediaKey mediaKey, HotKeyListener listener);
 
     /**
+     * Unregister a global hotkey. Only keyCode and modifiers fields are respected
+     *
+     * @param keyCode  KeyStroke to unregister
+     * @see KeyStroke
+     */
+    public abstract void unregister(KeyStroke keyCode);
+
+    /**
+     * Unregister a media hotkey. Currently supported media keys are:
+     * <br>
+     * <ul>
+     * <li>Play/Pause</li>
+     * <li>Stop</li>
+     * <li>Next track</li>
+     * <li>Previous Track</li>
+     * </ul>
+     *
+     * @param mediaKey media key to unregister
+     * @see MediaKey
+     */
+    public abstract void unregister(MediaKey mediaKey);
+
+    /**
      * Helper method fro providers to fire hotkey event in a separate thread
      *
      * @param hotKey hotkey to fire

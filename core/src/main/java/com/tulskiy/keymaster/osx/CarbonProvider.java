@@ -88,7 +88,12 @@ public class CarbonProvider extends Provider {
                         }
 
                         while (!registerQueue.isEmpty()) {
-                            register(registerQueue.poll());
+                            OSXHotKey hotKey = registerQueue.poll();
+                            if (hotKey.isUnregister()) {
+                                unregister(hotKey);
+                            } else {
+                                register(hotKey);
+                            }
                         }
 
                         try {
@@ -107,10 +112,7 @@ public class CarbonProvider extends Provider {
     private void resetAll() {
         LOGGER.info("Resetting hotkeys");
         for (OSXHotKey hotKey : hotKeys.values()) {
-            int ret = Lib.UnregisterEventHotKey(hotKey.handler.getValue());
-            if (ret != 0) {
-                LOGGER.warn("Could not unregister hotkey. Error code: " + ret);
-            }
+            unregisterHotKey(hotKey);
         }
         hotKeys.clear();
     }
@@ -137,6 +139,23 @@ public class CarbonProvider extends Provider {
         hotKey.handler = gMyHotKeyRef;
         LOGGER.info("Registered hotkey: " + keyCode);
         hotKeys.put(id, hotKey);
+    }
+
+    private void unregister(OSXHotKey hotKey) {
+        hotKeys.entrySet().removeIf(regHotKey -> {
+            boolean matches = hotKey.hasSameTrigger(regHotKey.getValue());
+            if (matches) {
+                unregisterHotKey(regHotKey.getValue());
+            }
+            return matches;
+        });
+    }
+
+    private void unregisterHotKey(OSXHotKey hotKey) {
+        int ret = Lib.UnregisterEventHotKey(hotKey.handler.getValue());
+        if (ret != 0) {
+            LOGGER.warn("Could not unregister hotkey. Error code: " + ret);
+        }
     }
 
     @Override
@@ -177,6 +196,17 @@ public class CarbonProvider extends Provider {
     }
 
     public void register(MediaKey mediaKey, HotKeyListener listener) {
+        LOGGER.warn("Media keys are not supported on this platform");
+    }
+
+    public void unregister(KeyStroke keyCode) {
+        synchronized (lock) {
+            registerQueue.add(new OSXHotKey(keyCode, null));
+            lock.notify();
+        }
+    }
+
+    public void unregister(MediaKey mediaKey) {
         LOGGER.warn("Media keys are not supported on this platform");
     }
 

@@ -90,13 +90,15 @@ public class X11Provider extends Provider {
 
                         while (!registerQueue.isEmpty()) {
                             X11HotKey hotKey = registerQueue.poll();
-                            LOGGER.info("Registering hotkey: " + hotKey);
-                            if (hotKey.isMedia()) {
-                                registerMedia(hotKey);
+                            if (hotKey.isUnregister()) {
+                                LOGGER.info("Unregistering hotkey: " + hotKey);
+                                unregisterHotKey(hotKey);
+                                hotKeys.removeIf(h -> h.hasSameTrigger(hotKey));
                             } else {
-                                register(hotKey);
+                                LOGGER.info("Registering hotkey: " + hotKey);
+                                registerHotKey(hotKey);
+                                hotKeys.add(hotKey);
                             }
-                            hotKeys.add(hotKey);
                         }
 
                         try {
@@ -132,6 +134,14 @@ public class X11Provider extends Provider {
         thread.start();
     }
 
+    private void registerHotKey(X11HotKey hotKey) {
+        if (hotKey.isMedia()) {
+            registerMedia(hotKey);
+        } else {
+            register(hotKey);
+        }
+    }
+
     private void register(X11HotKey hotKey) {
         byte code = KeyMap.getCode(hotKey.keyStroke, display);
         if (code == 0) {
@@ -155,18 +165,23 @@ public class X11Provider extends Provider {
         X11.INSTANCE.XGrabKey(display, keyCode, 0, window, 1, X11.GrabModeAsync, X11.GrabModeAsync);
     }
 
+
+    private void unregisterHotKey(X11HotKey hotKey) {
+        if (!hotKey.isMedia()) {
+            int modifiers = hotKey.modifiers;
+            for (int i = 0; i < 16; i++) {
+                int flags = correctModifiers(modifiers, i);
+
+                X11.INSTANCE.XUngrabKey(display, hotKey.code, flags, window);
+            }
+        } else {
+            X11.INSTANCE.XUngrabKey(display, hotKey.code, 0, window);
+        }
+    }
+
     private void resetAll() {
         for (X11HotKey hotKey : hotKeys) {
-            if (!hotKey.isMedia()) {
-                int modifiers = hotKey.modifiers;
-                for (int i = 0; i < 16; i++) {
-                    int flags = correctModifiers(modifiers, i);
-
-                    X11.INSTANCE.XUngrabKey(display, hotKey.code, flags, window);
-                }
-            } else {
-                X11.INSTANCE.XUngrabKey(display, hotKey.code, 0, window);
-            }
+            unregisterHotKey(hotKey);
         }
 
         hotKeys.clear();
@@ -208,6 +223,18 @@ public class X11Provider extends Provider {
     public void register(MediaKey mediaKey, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new X11HotKey(mediaKey, listener));
+        }
+    }
+
+    public void unregister(KeyStroke keyCode) {
+        synchronized (lock) {
+            registerQueue.add(new X11HotKey(keyCode, null));
+        }
+    }
+
+    public void unregister(MediaKey mediaKey) {
+        synchronized (lock) {
+            registerQueue.add(new X11HotKey(mediaKey, null));
         }
     }
 

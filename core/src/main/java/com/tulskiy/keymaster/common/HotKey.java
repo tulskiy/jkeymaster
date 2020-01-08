@@ -44,6 +44,17 @@ public class HotKey {
         return mediaKey != null;
     }
 
+    public boolean isUnregister() {
+        return listener == null;
+    }
+
+    public boolean hasSameTrigger(HotKey other) {
+        if (keyStroke != null) {
+            return other.keyStroke != null && keyStroke.equals(other.keyStroke);
+        }
+        return mediaKey == other.mediaKey;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
