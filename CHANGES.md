@@ -1,8 +1,9 @@
-Next release (1.3-SNAPSHOT)
+Release 1.3
 ---------------------------
 
 * [#15](https://github.com/tulskiy/jkeymaster/issues/15) added jkeymaster-dbus to work with media keys on gnome through dbus
 * [#19](https://github.com/tulskiy/jkeymaster/issues/19) fixed library hanging when there is a version conflict for jna on linux
+* [#36](https://github.com/tulskiy/jkeymaster/pull/36) unregistering individual hotkeys
 
 Release 1.2
 -----------
