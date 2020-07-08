@@ -17,14 +17,16 @@
 
 package com.tulskiy.keymaster;
 
-import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.MediaKey;
 import com.tulskiy.keymaster.common.Provider;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,42 +53,50 @@ public class AWTTest {
         textField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (MODIFIERS.contains(e.getKeyCode()))
+                if (MODIFIERS.contains(e.getKeyCode())) {
                     textField.setText("");
-                else
+                } else {
                     textField.setText(KeyStroke.getKeyStrokeForEvent(e).toString().replaceAll("pressed ", ""));
+                }
             }
         });
         frame.add(textField, BorderLayout.CENTER);
         JPanel box = new JPanel();
         JButton grab = new JButton("Grab");
+        JButton ungrab = new JButton("Ungrab");
+        JButton reset = new JButton("Reset All");
         box.add(grab);
-        final HotKeyListener listener = new HotKeyListener() {
-            public void onHotKey(final HotKey hotKey) {
-                JOptionPane.showMessageDialog(frame, "Hooray: " + hotKey);
-            }
-        };
-        grab.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String text = textField.getText();
-                if (text != null && text.length() > 0) {
-                    provider.reset();
-                    provider.register(KeyStroke.getKeyStroke(text), listener);
-                }
+        box.add(ungrab);
+
+        final HotKeyListener listener =
+                hotKey -> JOptionPane.showMessageDialog(frame, "Hooray: " + hotKey);
+        grab.addActionListener(e -> {
+            String text = textField.getText();
+            if (text != null && text.length() > 0) {
+                provider.register(KeyStroke.getKeyStroke(text), listener);
             }
         });
 
-        JButton grabMedia = new JButton("Grab media keys");
-        grabMedia.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                provider.register(MediaKey.MEDIA_NEXT_TRACK, listener);
-                provider.register(MediaKey.MEDIA_PLAY_PAUSE, listener);
-                provider.register(MediaKey.MEDIA_PREV_TRACK, listener);
-                provider.register(MediaKey.MEDIA_STOP, listener);
+        ungrab.addActionListener(e -> {
+            String text = textField.getText();
+            if (text != null && text.length() > 0) {
+                provider.unregister(KeyStroke.getKeyStroke(text));
             }
+        });
+
+        reset.addActionListener(e -> provider.reset());
+
+        JButton grabMedia = new JButton("Grab media keys");
+        grabMedia.addActionListener(e -> {
+            provider.register(MediaKey.MEDIA_NEXT_TRACK, listener);
+            provider.register(MediaKey.MEDIA_PLAY_PAUSE, listener);
+            provider.register(MediaKey.MEDIA_PREV_TRACK, listener);
+            provider.register(MediaKey.MEDIA_STOP, listener);
         });
 
         box.add(grabMedia);
+
+        box.add(reset);
 
         frame.add(box, BorderLayout.PAGE_END);
 
