@@ -27,6 +27,18 @@ import static java.awt.event.KeyEvent.VK_PLUS;
 import static java.awt.event.KeyEvent.VK_PRINTSCREEN;
 import static java.awt.event.KeyEvent.VK_SEMICOLON;
 import static java.awt.event.KeyEvent.VK_SLASH;
+import static java.awt.event.KeyEvent.VK_F13;
+import static java.awt.event.KeyEvent.VK_F14;
+import static java.awt.event.KeyEvent.VK_F15;
+import static java.awt.event.KeyEvent.VK_F16;
+import static java.awt.event.KeyEvent.VK_F17;
+import static java.awt.event.KeyEvent.VK_F18;
+import static java.awt.event.KeyEvent.VK_F19;
+import static java.awt.event.KeyEvent.VK_F20;
+import static java.awt.event.KeyEvent.VK_F21;
+import static java.awt.event.KeyEvent.VK_F22;
+import static java.awt.event.KeyEvent.VK_F23;
+import static java.awt.event.KeyEvent.VK_F24;
 
 import com.sun.jna.platform.win32.Win32VK;
 import com.sun.jna.platform.win32.WinUser;
@@ -54,6 +66,18 @@ class KeyMap {
         put(VK_SLASH, 0xBF);
         put(VK_SEMICOLON, 0xBA);
         put(VK_PRINTSCREEN, 0x2C);
+        put(VK_F13, 0x7C);
+        put(VK_F14, 0x7D);
+        put(VK_F15, 0x7E);
+        put(VK_F16, 0x7F);
+        put(VK_F17, 0x80);
+        put(VK_F18, 0x81);
+        put(VK_F19, 0x82);
+        put(VK_F20, 0x83);
+        put(VK_F21, 0x84);
+        put(VK_F22, 0x85);
+        put(VK_F23, 0x86);
+        put(VK_F24, 0x87);
     }};
 
     static int getCode(HotKey hotKey) {

@@ -47,9 +47,9 @@ public class X11Provider extends Provider {
     private static final Logger LOGGER = LoggerFactory.getLogger(X11Provider.class);
     private Display display;
     private Window window;
-    private boolean listening;
+    private volatile boolean listen = true;
     private Thread thread;
-    private boolean reset;
+    private volatile boolean reset;
     private ErrorHandler errorHandler;
     private final Object lock = new Object();
     private Queue<X11HotKey> registerQueue = new LinkedList<X11HotKey>();
@@ -63,7 +63,6 @@ public class X11Provider extends Provider {
                 errorHandler = new ErrorHandler();
                 X11.INSTANCE.XSetErrorHandler(errorHandler);
                 window = X11.INSTANCE.XDefaultRootWindow(display);
-                listening = true;
                 XEvent event = new XEvent();
 
                 IntByReference supported_rtrn = new IntByReference();
@@ -72,11 +71,13 @@ public class X11Provider extends Provider {
                     LOGGER.warn("auto repeat detection not supported");
                 }
 
-                while (listening) {
-                    while (X11.INSTANCE.XPending(display) > 0) {
-                        X11.INSTANCE.XNextEvent(display, event);
-                        if (event.type == X11.KeyPress || event.type == X11.KeyRelease) {
-                            processEvent(event);
+                while (listen || reset) {
+                    if (listen) {
+                        while (X11.INSTANCE.XPending(display) > 0) {
+                            X11.INSTANCE.XNextEvent(display, event);
+                            if (event.type == X11.KeyPress || event.type == X11.KeyRelease) {
+                                processEvent(event);
+                            }
                         }
                     }
 
@@ -85,7 +86,6 @@ public class X11Provider extends Provider {
                             LOGGER.info("Reset hotkeys");
                             resetAll();
                             reset = false;
-                            lock.notify();
                         }
 
                         while (!registerQueue.isEmpty()) {
@@ -102,7 +102,10 @@ public class X11Provider extends Provider {
                         }
 
                         try {
-                            lock.wait(300);
+                            // If already stopped, should continue to exit
+                            if (listen) {
+                                lock.wait(300);
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -110,7 +113,7 @@ public class X11Provider extends Provider {
 
                 }
 
-                LOGGER.info("Thread - stop listening");
+                LOGGER.info("Exit X11 global hotkey thread");
             }
 
             private void processEvent(XEvent event) {
@@ -130,7 +133,7 @@ public class X11Provider extends Provider {
             }
         };
 
-        thread = new Thread(runnable);
+        thread = new Thread(runnable, "JKeyMaster-X11");
         thread.start();
     }
 
@@ -202,8 +205,8 @@ public class X11Provider extends Provider {
 
     @Override
     public void stop() {
-        if (thread != null && thread.isAlive()) {
-            listening = false;
+        if (isRunning()) {
+            listen = false;
             try {
                 thread.join();
                 X11.INSTANCE.XCloseDisplay(display);
@@ -213,40 +216,46 @@ public class X11Provider extends Provider {
         }
         super.stop();
     }
+    
+    @Override
+    public boolean isRunning() {
+        return thread != null && thread.isAlive();
+    }
 
+    @Override
     public void register(KeyStroke keyCode, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new X11HotKey(keyCode, listener));
         }
     }
 
+    @Override
     public void register(MediaKey mediaKey, HotKeyListener listener) {
         synchronized (lock) {
             registerQueue.add(new X11HotKey(mediaKey, listener));
         }
     }
 
+    @Override
     public void unregister(KeyStroke keyCode) {
         synchronized (lock) {
             registerQueue.add(new X11HotKey(keyCode, null));
         }
     }
 
+    @Override
     public void unregister(MediaKey mediaKey) {
         synchronized (lock) {
             registerQueue.add(new X11HotKey(mediaKey, null));
         }
     }
 
+    @Override
     public void reset() {
-        synchronized (lock) {
-            if (thread.isAlive()) {
+        if (isRunning()) {
+            synchronized (lock) {
                 reset = true;
-                try {
-                    lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                registerQueue.clear();
             }
         }
     }

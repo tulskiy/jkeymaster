@@ -103,6 +103,17 @@ public abstract class Provider implements Closeable {
         reset();
         stop();
     }
+    
+    /**
+     * Determines whether the provider thread is still running. If the thread
+     * isn't running it may have been intentionally stopped via stop() or an
+     * unhandled error may have occured. If the thread isn't running this
+     * instance can't be used anymore. If the thread is running, it can probably
+     * still be used, however it might also just be about to stop.
+     * 
+     * @return
+     */
+    public abstract boolean isRunning();
 
     /**
      * Register a global hotkey. Only keyCode and modifiers fields are respected
