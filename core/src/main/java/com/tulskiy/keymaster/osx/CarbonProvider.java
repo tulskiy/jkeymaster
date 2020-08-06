@@ -51,7 +51,7 @@ public class CarbonProvider extends Provider {
     private Map<Integer, OSXHotKey> hotKeys = new HashMap<Integer, OSXHotKey>();
     private Queue<OSXHotKey> registerQueue = new LinkedList<OSXHotKey>();
     private final Object lock = new Object();
-    private boolean listen;
+    private boolean listen = true;
     private boolean reset;
 
     private EventHandlerProcPtr keyListener;
@@ -79,8 +79,7 @@ public class CarbonProvider extends Provider {
                     if (eventHandlerReference.getValue() == null) {
                         LOGGER.warn("Event Handler reference is null");
                     }
-                    listen = true;
-                    while (listen) {
+                    while (listen || reset) {
                         if (reset) {
                             resetAll();
                             reset = false;
@@ -97,14 +96,18 @@ public class CarbonProvider extends Provider {
                         }
 
                         try {
-                            lock.wait();
+                            // If already stopped, should continue to exit
+                            if (listen) {
+                                lock.wait();
+                            }
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
                 }
+                LOGGER.info("Exit Carbon global hotkey thread");
             }
-        });
+        }, "JKeyMaster-Carbon");
 
         thread.start();
     }
@@ -137,7 +140,7 @@ public class CarbonProvider extends Provider {
             return;
         }
         hotKey.handler = gMyHotKeyRef;
-        LOGGER.info("Registered hotkey: " + keyCode);
+        LOGGER.info(String.format("Registered hotkey: %s [%d]", hotKey, id));
         hotKeys.put(id, hotKey);
     }
 
@@ -154,21 +157,25 @@ public class CarbonProvider extends Provider {
     private void unregisterHotKey(OSXHotKey hotKey) {
         int ret = Lib.UnregisterEventHotKey(hotKey.handler.getValue());
         if (ret != 0) {
-            LOGGER.warn("Could not unregister hotkey. Error code: " + ret);
+            LOGGER.warn("Could not unregister hotkey ("+hotKey+"). Error code: " + ret);
+        } else {
+            LOGGER.info("Unregistering hotkey: " + hotKey);
         }
     }
 
     @Override
     public void stop() {
         LOGGER.info("Stopping now");
-        try {
-            synchronized (lock) {
-                listen = false;
-                lock.notify();
+        if (isRunning()) {
+            try {
+                synchronized (lock) {
+                    listen = false;
+                    lock.notify();
+                }
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
         if (eventHandlerReference.getValue() != null) {
             Lib.RemoveEventHandler(eventHandlerReference.getValue());
@@ -177,15 +184,18 @@ public class CarbonProvider extends Provider {
     }
 
     public void reset() {
-        synchronized (lock) {
-            reset = true;
-            lock.notify();
-            try {
-                lock.wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        if (isRunning()) {
+            synchronized (lock) {
+                reset = true;
+                registerQueue.clear();
+                lock.notify();
             }
         }
+    }
+    
+    @Override
+    public boolean isRunning() {
+        return thread != null && thread.isAlive();
     }
 
     public void register(KeyStroke keyCode, HotKeyListener listener) {
