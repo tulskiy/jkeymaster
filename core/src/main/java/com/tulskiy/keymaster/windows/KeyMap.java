@@ -127,8 +127,17 @@ class KeyMap {
         }
 
         String os = System.getProperty("os.version", "");
+
         // MOD_NOREPEAT only supported starting with Windows 7
-        if (os.compareTo("6.1") >= 0) {
+        boolean modNorepeatSupported;
+        try {
+            modNorepeatSupported = Double.parseDouble(os) >= 6.1;
+        } catch(NumberFormatException e) {
+            // Fallback to a String comparison
+            modNorepeatSupported = os.compareTo("6.1") >= 0;
+        }
+
+        if (modNorepeatSupported) {
             modifiers |= WinUser.MOD_NOREPEAT;
         }
 
