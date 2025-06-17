@@ -38,10 +38,6 @@ import java.util.concurrent.Executors;
 public abstract class Provider implements Closeable {
     private static final Logger LOGGER = LoggerFactory.getLogger(Provider.class);
 
-    static {
-        System.setProperty("jna.nosys", "true");
-    }
-
     private boolean useSwingEventQueue;
 
     /**
